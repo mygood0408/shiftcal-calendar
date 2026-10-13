@@ -1,6 +1,6 @@
 // 교대달력 service worker: 앱 파일을 기기에 저장해 오프라인에서도 열리게 합니다.
 // 파일을 수정해서 다시 배포할 때는 CACHE 이름의 버전 숫자를 올려주세요 (예: v2).
-const CACHE = "shiftcal-v1";
+const CACHE = "shiftcal-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
