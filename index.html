@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>교대달력</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f5f7a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="교대달력">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&family=Gowun+Dodum&family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --ink:#17212b; --ink-soft:#566676; --paper:#eef3f7; --card:#ffffff; --line:#d8e1e8;
+    --accent:#1f5f7a; --on-accent:#ffffff; --red:#c8383f;
+    --day:#3f7d5c; --day-soft:#e1efe6; --night:#33517e; --night-soft:#e2e8f4;
+    --off:#8a6bb0; --off-soft:#ece4f5; --rest:#9a938a; --rest-soft:#eeece7;
+    --leave:#c8383f; --leave-soft:#f8e3e4; --support:#17212b; --warn:#c8383f;
+    --shadow:0 1px 2px rgba(23,33,43,.06), 0 6px 16px rgba(23,33,43,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#e6edf3; --ink-soft:#9fb0c0; --paper:#0f1720; --card:#172230; --line:#263545;
+      --accent:#5fb3d1; --on-accent:#0f1720; --red:#ff7b7b;
+      --day:#6cbf93; --day-soft:#1e3327; --night:#7fa3e0; --night-soft:#1e2a3f;
+      --off:#c3a4ef; --off-soft:#2c2340; --rest:#b3aa9c; --rest-soft:#2c2921;
+      --leave:#ff7b7b; --leave-soft:#3a2024; --support:#e6edf3; --warn:#ff7b7b;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#e6edf3; --ink-soft:#9fb0c0; --paper:#0f1720; --card:#172230; --line:#263545;
+    --accent:#5fb3d1; --on-accent:#0f1720; --red:#ff7b7b;
+    --day:#6cbf93; --day-soft:#1e3327; --night:#7fa3e0; --night-soft:#1e2a3f;
+    --off:#c3a4ef; --off-soft:#2c2340; --rest:#b3aa9c; --rest-soft:#2c2921;
+    --leave:#ff7b7b; --leave-soft:#3a2024; --support:#e6edf3; --warn:#ff7b7b;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html, body{ height:100%; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-main, "Noto Sans KR", -apple-system, sans-serif);
+    padding-inline:16px; padding-bottom: calc(20px + env(safe-area-inset-bottom,0px)); min-height:100%; }
+  body.locked{ height:100dvh; overflow:hidden; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; }
+  body.locked header.top{ flex:0 0 auto; }
+  button{ font-family:inherit; }
+  .num{ font-family:var(--font-num, "Space Grotesk","Noto Sans KR",sans-serif); font-variant-numeric:tabular-nums; }
+  header.top{ position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--paper); padding-block:14px 8px;
+    display:flex; align-items:center; gap:8px; }
+  header.top h1{ font-size:17px; margin:0; font-weight:900; letter-spacing:-.02em; display:flex; align-items:center; gap:6px; flex:0 0 auto; white-space:nowrap; }
+  .team-badge{ font-size:11px; font-weight:700; background:var(--accent); color:var(--on-accent); padding:2px 8px; border-radius:20px; flex:0 0 auto; }
+  .icon-btn{ border:none; background:var(--card); color:var(--ink); width:34px; height:34px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); cursor:pointer; font-size:15px; flex:0 0 auto; }
+  .header-leaves{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .hl-pill{ flex:0 0 auto; display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--ink); border-radius:20px; padding:5px 10px 5px 8px; white-space:nowrap; border:1px solid transparent; }
+  .hl-pill{ position:relative; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; cursor:grab; }
+  .hl-pill.dragging{ opacity:.85; box-shadow:0 6px 18px rgba(0,0,0,.25); z-index:10; }
+  .hl-pill.drop-target{ outline:2px dashed var(--accent); outline-offset:2px; }
+  .panel-hint{ font-size:11px; color:var(--ink-soft); margin:-4px 0 8px 2px; }
+  .hl-pill .dot{ width:6px; height:6px; border-radius:50%; flex:0 0 auto; }
+  .hl-pill .n{ color:var(--ink-soft); font-weight:500; }
+  .summary-toggle{ display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:var(--card); box-shadow:var(--shadow); border-radius:12px; padding:9px 12px; margin-bottom:8px;
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; flex:0 0 auto; }
+  .summary-toggle .chev{ transition:transform .15s ease; flex:0 0 auto; }
+  .summary-toggle.open .chev{ transform:rotate(180deg); }
+  .summary-panel{ margin-bottom:8px; flex:0 0 auto; }
+  .month-nav{ display:flex; align-items:center; gap:10px; margin-block:4px 12px; flex:0 0 auto; }
+  .month-nav .mtitle{ font-size:22px; font-weight:700; flex:1; text-align:center; }
+  .month-nav button{ border:none; background:var(--card); box-shadow:var(--shadow); width:34px; height:34px; border-radius:9px; color:var(--ink); font-size:15px; cursor:pointer; }
+  .month-nav .today-btn{ width:auto; padding:0 10px; font-size:12px; font-weight:700; }
+  .summary-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; margin-bottom:0; }
+  .stat{ background:var(--card); border-radius:14px; padding:10px 10px; box-shadow:var(--shadow); }
+  .stat .label{ font-size:11px; color:var(--ink-soft); margin-bottom:4px; }
+  .stat .value{ font-size:18px; font-weight:700; }
+  .stat .value small{ font-size:11px; font-weight:500; color:var(--ink-soft); }
+  .weekdays{ display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:11px; color:var(--ink-soft); margin-bottom:6px; flex:0 0 auto; }
+  .weekdays span:first-child{ color:var(--red); }
+  .weekdays span:last-child{ color:var(--night); }
+  .weekdays span.holiday{ color:var(--red); }
+  .grid{ display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:1fr; gap:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; flex:1 1 auto; min-height:0; }
+  .cell{ height:100%; min-height:78px; background:var(--card);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:4px 1px 4px;
+    cursor:pointer; position:relative; border-right:1px solid var(--line); border-bottom:1px solid var(--line); min-width:0;
+    overflow:hidden; box-sizing:border-box; }
+  .cell.empty{ background:var(--paper); cursor:default; }
+  .cell .d{ font-size:12.5px; font-weight:600; margin-top:1px; }
+  .cell.sat .d{ color:var(--night); }
+  .cell.sun .d, .cell.holiday .d{ color:var(--red); }
+  .cell.today{ box-shadow:inset 0 0 0 2px var(--accent); }
+  .cell.leave-day{ background:color-mix(in srgb, var(--red) 4%, transparent); box-shadow:inset 0 0 0 2px var(--warn); }
+  .cell .drow{ display:flex; align-items:center; gap:4px; }
+  .cell .sdot{ width:5px; height:5px; border-radius:50%; background:var(--support); flex:0 0 auto; }
+  .cell .tag{ margin-top:3px; font-size:10px; font-weight:700; border-radius:6px; padding:1px 5px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cell .memo-text{ margin-top:2px; max-width:100%; padding:0 2px; }
+  .cell .memo-line{ font-size:9px; line-height:1.3; color:var(--ink-soft); text-align:center; white-space:nowrap; letter-spacing:-0.3px; }
+  .cell .dots{ display:flex; gap:2px; margin-top:auto; margin-bottom:1px; }
+  .cell .dot{ width:4px; height:4px; border-radius:50%; }
+  .leave-scroll{ display:flex; gap:8px; overflow-x:auto; margin-top:10px; padding-bottom:4px; }
+  .leave-pill{ flex:0 0 auto; background:var(--card); border-radius:12px; padding:8px 12px; box-shadow:var(--shadow); min-width:92px; }
+  .leave-pill .ln{ font-size:11px; color:var(--ink-soft); margin-bottom:3px; white-space:nowrap; }
+  .leave-pill .lv{ font-size:15px; font-weight:700; }
+  .leave-pill .lex{ font-size:10px; color:var(--warn); margin-top:2px; white-space:nowrap; }
+  section.view{ display:none; }
+  section.view.active{ display:block; }
+  #view-cal.active{ display:flex; flex-direction:column; min-height:0; }
+  body.locked #view-cal.active{ flex:1 1 auto; min-height:0; }
+  .settings-head{ position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--paper);
+    display:flex; align-items:center; gap:10px; padding-block:14px 8px; margin-bottom:4px; }
+  .settings-head button{ border:none; background:var(--card); color:var(--ink); width:34px; height:34px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); cursor:pointer; font-size:16px; flex:0 0 auto; }
+  .settings-head h1{ font-size:18px; margin:0; font-weight:900; }
+  h2.st{ font-size:16px; font-weight:700; margin:12px 0 0; padding:12px 4px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; -webkit-user-select:none; }
+  h2.st .chev{ transition:transform .15s ease; color:var(--ink-soft); flex:0 0 auto; }
+  h2.st.open .chev{ transform:rotate(180deg); }
+  .sec-body{ padding-bottom:6px; }
+  .card{ background:var(--card); border-radius:16px; padding:14px; box-shadow:var(--shadow); margin-bottom:12px; }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding-block:8px; border-bottom:1px solid var(--line); }
+  .row:last-child{ border-bottom:none; }
+  .row .rt{ font-size:12px; color:var(--ink-soft); }
+  input[type=text], input[type=number], input[type=date], select, textarea{
+    font-family:inherit; font-size:14px; color:var(--ink); background:var(--paper); border:1px solid var(--line);
+    border-radius:9px; padding:8px 10px; width:100%; }
+  textarea{ resize:vertical; min-height:56px; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  input[type=color]{ width:34px; height:34px; border:none; border-radius:8px; padding:0; background:none; }
+  .btn{ border:none; border-radius:11px; padding:10px 14px; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; }
+  .btn.primary{ background:var(--accent); color:var(--on-accent); }
+  .btn.ghost{ background:var(--card); color:var(--ink); box-shadow:var(--shadow); }
+  .btn.block{ width:100%; }
+  .code-edit{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .code-edit .idx{ width:16px; font-size:11px; color:var(--ink-soft); }
+  .code-edit input[type=text]{ flex:1; }
+  .code-edit .del{ background:none; border:none; color:var(--red); font-size:15px; cursor:pointer; }
+  .hint{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin-top:6px; }
+  .team-chips{ display:flex; gap:8px; }
+  .team-chips button{ flex:1; border:1.5px solid var(--line); background:var(--card); color:var(--ink); border-radius:12px; padding:10px 0; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .team-chips button.sel{ border-color:var(--accent); background:var(--accent); color:var(--on-accent); }
+  .field{ margin-bottom:12px; }
+  .field label{ display:block; font-size:12px; color:var(--ink-soft); margin-bottom:5px; font-weight:500; }
+  .field-inline{ display:flex; gap:8px; }
+  .field-inline > div{ flex:1; }
+  .chip-select{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip-select button{ border:1.5px solid var(--line); background:var(--card); color:var(--ink); border-radius:20px; padding:6px 12px; font-size:12.5px; cursor:pointer; font-family:inherit; }
+  .chip-select button.sel{ border-color:transparent; color:#fff; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; }
+  .switch{ position:relative; width:42px; height:24px; flex:0 0 auto; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:var(--line); border-radius:99px; cursor:pointer; transition:.15s; }
+  .slider:before{ content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.15s; }
+  .switch input:checked + .slider{ background:var(--accent); }
+  .switch input:checked + .slider:before{ transform:translateX(18px); }
+  .leave-detail{ background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:8px; display:flex; flex-direction:column; gap:10px; }
+
+  .font-opt{ display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:var(--paper); color:var(--ink); border-radius:12px; padding:10px 12px; margin-bottom:8px; cursor:pointer; }
+  .font-opt:last-child{ margin-bottom:0; }
+  .font-opt.sel{ border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
+  .font-opt .fo-name{ font-size:15px; font-weight:700; }
+  .font-opt .fo-sample{ font-size:13px; color:var(--ink-soft); margin-top:3px; }
+  .leave-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .type-card{ border:1px solid var(--line); border-radius:12px; padding:9px; background:var(--card); }
+  .type-card .thead{ display:flex; align-items:center; gap:5px; margin-bottom:6px; }
+  .type-card .thead input[type=text]{ flex:1; font-weight:700; font-size:12.5px; padding:6px 7px; background:rgba(255,255,255,.55); }
+  .type-card .tname{ flex:1; font-weight:700; font-size:12.5px; }
+  .type-card .dot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .leave-group-title{ font-size:12px; font-weight:700; color:var(--ink-soft); margin:14px 0 8px; }
+  .add-type-row{ display:flex; gap:8px; margin:10px 0 20px; }
+  .add-type-row .btn{ flex:1; }
+  .type-card .drag-handle{ flex:0 0 auto; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; color:var(--ink-soft); font-size:14px; line-height:1; padding:6px 2px; letter-spacing:-2px; }
+  .type-card{ position:relative; }
+  .type-card.dragging{ opacity:.8; box-shadow:0 8px 24px rgba(0,0,0,.25); z-index:10; }
+  .type-card.drop-target{ outline:2px dashed var(--accent); outline-offset:1px; }
+  .drag-handle{ -webkit-touch-callout:none; }
+  .type-card .del{ background:none; border:none; color:var(--red); font-size:14px; cursor:pointer; flex:0 0 auto; padding:0 2px; }
+  .type-card .sub{ font-size:10px; color:var(--ink-soft); margin:6px 0 3px; }
+  .bucket-mini{ display:flex; gap:6px; }
+  .bucket-mini label{ display:block; font-size:9.5px; color:var(--ink-soft); margin-bottom:3px; white-space:nowrap; }
+  .bucket-mini input{ padding:6px 6px; font-size:12px; width:100%; box-sizing:border-box; }
+  .bucket-mini .bm-count{ flex:1; min-width:34px; }
+  .bucket-mini .bm-expiry{ flex:3; min-width:0; }
+  .bm-expiry-row{
+    display:flex; align-items:center; gap:0;
+    border:1px solid var(--line); border-radius:8px; background:var(--card);
+    overflow:hidden; box-sizing:border-box;
+  }
+  .bm-expiry-row .bm-year{
+    flex:0 0 26px; min-width:0; width:26px; padding:6px 0; text-align:center;
+    border:none; background:transparent; box-sizing:border-box;
+    -moz-appearance:textfield;
+  }
+  .bm-expiry-row .bm-year::-webkit-outer-spin-button,
+  .bm-expiry-row .bm-year::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .bm-expiry-row .bm-year:focus{ outline:none; }
+  .bm-expiry-row .bm-yr-suffix{ font-size:12px; color:var(--ink-soft); padding-right:3px; flex:0 0 auto; white-space:nowrap; }
+  .bm-expiry-row .bm-preset{
+    flex:0 0 50px; width:50px; min-width:0; padding:6px 2px; font-size:11px;
+    border:none; border-left:1px solid var(--line); background:transparent;
+    box-sizing:border-box; appearance:none; -webkit-appearance:none;
+    text-align:center;
+  }
+  [hidden]{ display:none !important; }
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:20; display:flex; align-items:flex-end; }
+  .sheet{ background:var(--paper); width:100%; border-radius:20px 20px 0 0; padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px)); max-height:88vh; overflow-y:auto; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>교대달력 <span class="team-badge" id="teamBadge">A반</span></h1>
+  <button class="icon-btn" id="settingsOpenBtn" title="설정" style="margin-left:auto;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
+</header>
+
+<section class="view active" id="view-cal">
+  <div class="summary-toggle" id="summaryToggle">
+    <span>휴가·이번달 현황</span>
+    <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  </div>
+  <div class="summary-panel" id="summaryPanel" hidden>
+    <div class="header-leaves" id="headerLeaves"></div>
+    <div class="panel-hint">휴가 이름을 꾹 잡고 끌면 순서를 바꿀 수 있어요</div>
+    <div class="summary-row">
+      <div class="stat">
+        <div class="label">이번 달 근무</div>
+        <div class="value num" id="statWork">0<small> 일</small></div>
+      </div>
+      <div class="stat">
+        <div class="label">지원근무</div>
+        <div class="value num" id="statSupport">0<small> 회</small></div>
+      </div>
+      <div class="stat">
+        <div class="label">이번 달 휴가</div>
+        <div class="value num" id="statLeave">0<small> 일</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="month-nav">
+    <button id="prevM">‹</button>
+    <div class="mtitle num" id="mTitle">2026년 9월</div>
+    <button class="today-btn" id="todayBtn">오늘</button>
+    <button id="nextM">›</button>
+  </div>
+
+  <div class="weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="view" id="view-settings">
+  <div class="settings-head">
+    <button id="settingsBackBtn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
+    <h1>설정</h1>
+  </div>
+
+  <h2 class="st">내 반</h2>
+  <div class="card">
+    <div class="team-chips" id="teamChips"></div>
+    <p class="hint" id="anchorHint"></p>
+    <div class="toggle-row" style="margin-top:10px;">
+      <label style="margin:0;font-size:13px;">반 순환 방향 반대로</label>
+      <label class="switch"><input type="checkbox" id="dirToggle"><span class="slider"></span></label>
+    </div>
+    <p class="hint">달력이 실제 근무표와 하루 이상 어긋나면 이 스위치를 눌러보세요.</p>
+  </div>
+
+  <h2 class="st">휴가 종류</h2>
+  <div class="leave-group-title">이월되는 휴가</div>
+  <div class="leave-grid" id="leaveTypeListCarry"></div>
+  <div class="leave-group-title">이월 안 되는 휴가</div>
+  <div class="leave-grid" id="leaveTypeListPlain"></div>
+  <div class="add-type-row">
+    <button class="btn ghost" id="addLeaveTypeCarry">+ 이월되는 휴가 추가</button>
+    <button class="btn ghost" id="addLeaveTypePlain">+ 이월 안되는 휴가 추가</button>
+  </div>
+
+  <h2 class="st">근무형태 (4일 주기)</h2>
+  <div class="card" id="codeList"></div>
+
+  <h2 class="st">연차 계산</h2>
+  <div class="card">
+    <div class="field-inline">
+      <div class="field" style="margin-bottom:0;">
+        <label>연차 총 지급일수</label>
+        <input type="number" id="annualTotal" min="0" step="0.5">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>촉진연차 개수</label>
+        <input type="number" id="promotedFixed" min="0" step="0.5">
+      </div>
+    </div>
+    <p class="hint">총 연차 중 여기서 지정한 개수만큼 자동으로 촉진연차로 분리되고, 나머지가 일반 연차가 돼요.</p>
+  </div>
+
+  <h2 class="st">글꼴</h2>
+  <div class="card" id="fontList"></div>
+
+  <h2 class="st">데이터</h2>
+  <div class="card">
+    <div class="row">
+      <div>
+        <div>백업 파일 내보내기</div>
+        <div class="rt">근무설정 + 기록을 파일로 저장</div>
+      </div>
+      <button class="btn ghost" id="exportBtn">내보내기</button>
+    </div>
+    <div class="row">
+      <div>
+        <div>백업 파일 불러오기</div>
+        <div class="rt">내보낸 파일로 복원</div>
+      </div>
+      <button class="btn ghost" id="importBtn">불러오기</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" hidden>
+  </div>
+  <p class="hint" style="text-align:center;margin:14px 0 4px;">모든 데이터는 이 기기 브라우저에만 저장돼요. 서버로 전송되지 않아요.</p>
+</section>
+
+<div class="overlay" id="dayOverlay" hidden>
+  <div class="sheet">
+    <div class="shead" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="sd" id="sheetDate" style="font-size:17px;font-weight:700;">9월 22일 (화)</div>
+      <button id="sheetClose" style="background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;">✕</button>
+    </div>
+
+    <div class="field">
+      <label>자동 근무형태</label>
+      <div class="chip-select" id="shiftChips"></div>
+      <p class="hint">기본값은 자동 계산된 근무예요. 다른 걸 누르면 그 날짜만 바뀌어요.</p>
+    </div>
+
+    <div class="field toggle-row">
+      <label style="margin:0;">지원근무 (비번·휴무일 추가 근무)</label>
+      <label class="switch"><input type="checkbox" id="supportToggle"><span class="slider"></span></label>
+    </div>
+
+    <div class="field toggle-row">
+      <label style="margin:0;">휴가 사용</label>
+      <label class="switch"><input type="checkbox" id="leaveToggle"><span class="slider"></span></label>
+    </div>
+    <div class="leave-detail" id="leaveDetail" hidden>
+      <div class="field" style="margin-bottom:0;">
+        <label>휴가 종류</label>
+        <select id="leaveTypeSelect"></select>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>사용 일수</label>
+        <input type="number" id="leaveAmount" min="0.5" step="0.5" value="1">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>메모 / 개인 일정</label>
+      <textarea id="memoInput" placeholder="예: 병원 예약, 회식 등"></textarea>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:6px;">
+      <button class="btn ghost block" id="resetDayBtn">이 날짜 초기화</button>
+      <button class="btn primary block" id="saveDayBtn">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var STORAGE_KEY = "shiftcal.v4";
+  var OLD_KEYS = ["shiftcal.v3", "shiftcal.v2"];
+  function isoOf(d){ return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+  function pad2(n){ return n<10?"0"+n:""+n; }
+  function todayISO(){ return isoOf(new Date()); }
+
+  var TEAMS = ["A","B","C","D"];
+
+  // 한국 공휴일 (음력 기반 날짜는 매해 계산이 필요해 연도별로 직접 지정함 — 대체공휴일 포함, 추정치일 수 있어 확인 필요)
+  var HOLIDAYS = {
+    "2025-01-01":"신정","2025-01-28":"설날연휴","2025-01-29":"설날","2025-01-30":"설날연휴",
+    "2025-03-01":"삼일절","2025-03-03":"대체공휴일","2025-05-05":"어린이날·부처님오신날","2025-05-06":"대체공휴일",
+    "2025-06-06":"현충일","2025-08-15":"광복절","2025-10-03":"개천절",
+    "2025-10-05":"추석연휴","2025-10-06":"추석","2025-10-07":"추석연휴","2025-10-08":"대체공휴일",
+    "2025-10-09":"한글날","2025-12-25":"성탄절",
+    "2026-01-01":"신정","2026-02-16":"설날연휴","2026-02-17":"설날","2026-02-18":"설날연휴",
+    "2026-03-01":"삼일절","2026-03-02":"대체공휴일","2026-05-05":"어린이날","2026-05-24":"부처님오신날","2026-05-25":"대체공휴일",
+    "2026-06-06":"현충일","2026-08-15":"광복절","2026-08-17":"대체공휴일",
+    "2026-09-24":"추석연휴","2026-09-25":"추석","2026-09-26":"추석연휴",
+    "2026-10-03":"개천절","2026-10-09":"한글날","2026-12-25":"성탄절",
+    "2027-01-01":"신정","2027-02-06":"설날연휴","2027-02-07":"설날","2027-02-08":"설날연휴","2027-02-09":"대체공휴일",
+    "2027-03-01":"삼일절","2027-05-05":"어린이날","2027-05-13":"부처님오신날","2027-06-06":"현충일",
+    "2027-08-15":"광복절","2027-08-16":"대체공휴일","2027-09-14":"추석연휴","2027-09-15":"추석","2027-09-16":"추석연휴",
+    "2027-10-03":"개천절","2027-10-04":"대체공휴일","2027-10-09":"한글날","2027-12-25":"성탄절",
+    "2028-01-01":"신정","2028-01-26":"설날연휴","2028-01-27":"설날","2028-01-28":"설날연휴",
+    "2028-03-01":"삼일절","2028-05-05":"어린이날","2028-05-02":"부처님오신날","2028-06-06":"현충일",
+    "2028-08-15":"광복절","2028-10-02":"추석연휴","2028-10-03":"개천절·추석","2028-10-04":"추석연휴","2028-10-05":"대체공휴일",
+    "2028-10-09":"한글날","2028-12-25":"성탄절"
+  };
+  function holidayName(iso){ return HOLIDAYS[iso] || null; }
+
+  var DEFAULT_STATE = {
+    codes: [
+      {id:"c0", name:"주간", color:"#3f7d5c"},
+      {id:"c1", name:"야간", color:"#33517e"},
+      {id:"c2", name:"비번", color:"#8a6bb0"},
+      {id:"c3", name:"휴무", color:"#9a938a"}
+    ],
+    anchor: { date: "2026-09-23", team: "A", codeIndex: 2 },
+    myTeam: "A",
+    reverseDir: false,
+    annualTotal: 15,
+    annualExpiry: "",
+    promotedFixed: 8,
+    promotedExpiry: "",
+    annualCarry: { total:0, expiry:"" },
+    bucketYear: new Date().getFullYear(),
+    font: "noto",
+    leaveOrder: [],
+    leaveTypes: [
+      {id:"mangeun", name:"만근휴가", total:1, expiry:"", totalNext:0, expiryNext:"", carryOver:false, resetsYearly:true},
+      {id:"daeche", name:"대체휴가", total:5, expiry:"", totalNext:0, expiryNext:"", carryOver:true, resetsYearly:true},
+      {id:"jangki", name:"장기재직휴가", total:0, expiry:"", totalNext:0, expiryNext:"", carryOver:false, resetsYearly:false},
+      {id:"gyoyuk", name:"교육휴가", total:2, expiry:"", totalNext:0, expiryNext:"", carryOver:false, resetsYearly:true}
+    ],
+    overrides: {} // iso -> {code, support, leave, leaveTypeId, leaveAmount, memo}
+  };
+
+  var KNOWN_CARRYOVER = { daeche:true, mangeun:false, jangki:false, gyoyuk:false };
+  var KNOWN_RESET_YEARLY = { jangki:false }; // everything else defaults to true (매년 갱신)
+  // 매해 1월1일에 자동으로 채워지는 고정 지급 개수 (장기재직휴가 제외, 연차/촉진연차는 별도 계산식 사용)
+  var ANNUAL_GRANT = { daeche:5, gyoyuk:2, mangeun:1 };
+  function migrateLeaveType(t){
+    var carryOver;
+    if(Object.prototype.hasOwnProperty.call(KNOWN_CARRYOVER, t.id)){
+      carryOver = KNOWN_CARRYOVER[t.id]; // fixed default types: always correct, ignores any bad migrated value
+    } else if(typeof t.carryOver === "boolean"){
+      carryOver = t.carryOver;
+    } else {
+      carryOver = !!(t.totalNext || t.expiryNext);
+    }
+    var resetsYearly = Object.prototype.hasOwnProperty.call(KNOWN_RESET_YEARLY, t.id)
+      ? KNOWN_RESET_YEARLY[t.id]
+      : (typeof t.resetsYearly === "boolean" ? t.resetsYearly : true);
+    return {
+      id: t.id, name: t.name || t.id,
+      total: typeof t.total==="number" ? t.total : 0,
+      expiry: t.expiry || "",
+      totalNext: typeof t.totalNext==="number" ? t.totalNext : 0,
+      expiryNext: t.expiryNext || "",
+      carryOver: carryOver,
+      resetsYearly: resetsYearly
+    };
+  }
+  function pastelColor(i){
+    var hue = Math.round((i*137.508) % 360);
+    return {
+      tint: "hsla("+hue+",70%,55%,0.14)",
+      border: "hsla("+hue+",55%,55%,0.35)",
+      dot: "hsl("+hue+",65%,72%)"
+    };
+  }
+
+  var FONTS = {
+    noto:  { label:"Noto Sans KR (기본)", main:'"Noto Sans KR", -apple-system, sans-serif', num:'"Space Grotesk","Noto Sans KR",sans-serif' },
+    gowun: { label:"고운돋움 (부드러운 느낌)", main:'"Gowun Dodum","Noto Sans KR",sans-serif', num:'"Gowun Dodum","Noto Sans KR",sans-serif' },
+    jua:   { label:"주아 (귀여운 느낌)", main:'"Jua","Noto Sans KR",sans-serif', num:'"Jua","Noto Sans KR",sans-serif' },
+    plex:  { label:"IBM Plex Sans KR (또렷하고 단정한 느낌)", main:'"IBM Plex Sans KR","Noto Sans KR",sans-serif', num:'"IBM Plex Sans KR","Noto Sans KR",sans-serif' }
+  };
+  function applyFont(){
+    var f = FONTS[state.font] || FONTS.noto;
+    document.documentElement.style.setProperty("--font-main", f.main);
+    document.documentElement.style.setProperty("--font-num", f.num);
+  }
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var s;
+      if(raw){ s = JSON.parse(raw); }
+      else{
+        for(var i=0;i<OLD_KEYS.length && !s;i++){
+          var old = localStorage.getItem(OLD_KEYS[i]);
+          if(old) s = JSON.parse(old);
+        }
+      }
+      if(!s || !s.codes || !s.anchor) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      s.overrides = s.overrides || {};
+      s.leaveTypes = (s.leaveTypes || []).map(migrateLeaveType);
+      if(typeof s.annualTotal !== "number") s.annualTotal = 0;
+      if(!s.annualExpiry) s.annualExpiry = "";
+      if(!s.promotedExpiry) s.promotedExpiry = "";
+      if(typeof s.promotedFixed !== "number"){
+        if(s.promotionRules && s.promotionRules.length){
+          s.promotedFixed = s.promotionRules[s.promotionRules.length-1].promoted || 8;
+        } else if(typeof s.annualPromoted === "number"){
+          s.promotedFixed = s.annualPromoted;
+        } else { s.promotedFixed = 8; }
+      }
+      if(!s.annualCarry) s.annualCarry = { total:0, expiry:"" };
+      delete s.promotionRules; delete s.annualPromoted;
+      if(!s.myTeam) s.myTeam = "A";
+      if(typeof s.reverseDir !== "boolean") s.reverseDir = false;
+      if(typeof s.bucketYear !== "number") s.bucketYear = new Date().getFullYear();
+      if(!s.font) s.font = "noto";
+      if(!Array.isArray(s.leaveOrder)) s.leaveOrder = [];
+      return s;
+    }catch(e){
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+  }
+  function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+  // 새해가 되면 "내년분"으로 넣어둔 이월 휴가를 "올해분"으로 자동 승격시킨다.
+  function rollBucketsToCurrentYear(s){
+    var nowY = new Date().getFullYear();
+    var changed = false;
+    while(s.bucketYear < nowY){
+      s.annualTotal = s.annualCarry.total || 0;
+      s.annualExpiry = s.annualCarry.expiry || "";
+      s.annualCarry = { total:0, expiry:"" };
+      s.leaveTypes.forEach(function(t){
+        if(t.carryOver){
+          t.total = t.totalNext || 0;
+          t.expiry = t.expiryNext || "";
+          t.totalNext = 0;
+          t.expiryNext = "";
+        }
+        if(Object.prototype.hasOwnProperty.call(ANNUAL_GRANT, t.id)){
+          t.total = ANNUAL_GRANT[t.id];
+        }
+      });
+      s.bucketYear++;
+      changed = true;
+    }
+    return changed;
+  }
+
+  var state = loadState();
+  if(rollBucketsToCurrentYear(state)) saveState();
+  var view = { y: new Date().getFullYear(), m: new Date().getMonth() };
+  var openDayIso = null;
+
+  function codeById(id){ for(var i=0;i<state.codes.length;i++) if(state.codes[i].id===id) return state.codes[i]; return null; }
+  function daysBetween(a,b){ var A=new Date(a+"T00:00:00"), B=new Date(b+"T00:00:00"); return Math.round((B-A)/86400000); }
+
+  var EXPIRY_PRESETS = [ {v:"11-30", label:"11/30"}, {v:"12-31", label:"12/31"} ];
+  function formatExpiryShort(iso){
+    if(!iso) return "";
+    var parts = iso.split("-");
+    if(parts.length!==3) return iso;
+    var yy = parts[0].slice(-2);
+    return yy+"."+parts[1]+"."+parts[2];
+  }
+  function parseExpiry(iso){
+    if(!iso) return { yy:"", preset:EXPIRY_PRESETS[0].v };
+    var parts = iso.split("-");
+    if(parts.length!==3) return { yy:"", preset:EXPIRY_PRESETS[0].v };
+    var yy = parts[0].slice(-2);
+    var preset = parts[1]+"-"+parts[2];
+    var ok = EXPIRY_PRESETS.some(function(p){ return p.v===preset; });
+    return { yy:yy, preset: ok?preset:EXPIRY_PRESETS[0].v };
+  }
+
+  function promotedAmount(){ return Math.max(0, Math.min(state.promotedFixed||0, state.annualTotal||0)); }
+  function normalAmount(){ return Math.max(0, (state.annualTotal||0) - promotedAmount()); }
+
+  function allLeaveTypes(natural){
+    var list = [
+      { id:"yeoncha", name:"연차", special:true, carryOver:true, resetsYearly:true,
+        b1:{total:normalAmount(), expiry:state.annualExpiry},
+        b2:{total:state.annualCarry.total||0, expiry:state.annualCarry.expiry} },
+      { id:"chokjin", name:"촉진연차", special:true, carryOver:false, resetsYearly:true,
+        b1:{total:promotedAmount(), expiry:state.promotedExpiry},
+        b2:null }
+    ];
+    state.leaveTypes.forEach(function(t){
+      list.push({ id:t.id, name:t.name, special:false, carryOver:!!t.carryOver, resetsYearly: t.resetsYearly!==false,
+        b1:{total:t.total||0, expiry:t.expiry},
+        b2: t.carryOver ? {total:t.totalNext||0, expiry:t.expiryNext} : null });
+    });
+    list.forEach(function(t, i){ t.colorIdx = i; }); // 색상은 순서를 바꿔도 휴가마다 고정
+    var ord = state.leaveOrder || [];
+    if(!natural) list.sort(function(a,b){
+      var ia = ord.indexOf(a.id), ib = ord.indexOf(b.id);
+      if(ia<0) ia = 1e6 + a.colorIdx;
+      if(ib<0) ib = 1e6 + b.colorIdx;
+      return ia - ib;
+    });
+    list.forEach(function(t){
+      t.total = t.b1.total + (t.b2 ? t.b2.total : 0);
+      var exps = [t.b1.expiry, t.b2 ? t.b2.expiry : null].filter(Boolean).sort();
+      t.expiry = exps[0] || null;
+    });
+    return list;
+  }
+  function leaveTypeById(id){ var list = allLeaveTypes(); for(var i=0;i<list.length;i++) if(list[i].id===id) return list[i]; return null; }
+  function leaveUsedByType(id, yearOnly){
+    var used = 0;
+    var yStr = String(view.y);
+    Object.keys(state.overrides).forEach(function(iso){
+      var ov = state.overrides[iso];
+      if(ov && ov.leave && ov.leaveTypeId === id){
+        if(!yearOnly || iso.indexOf(yStr+"-")===0) used += (ov.leaveAmount||1);
+      }
+    });
+    return used;
+  }
+
+  // ---------- Auto shift calc ----------
+  function autoCodeIndexFor(team, iso){
+    var n = state.codes.length || 4;
+    var diff = daysBetween(state.anchor.date, iso);
+    var teamOffset = TEAMS.indexOf(team) - TEAMS.indexOf(state.anchor.team);
+    if(state.reverseDir) teamOffset = -teamOffset;
+    var idx = ((state.anchor.codeIndex + diff + teamOffset) % n + n) % n;
+    return idx;
+  }
+  function autoCodeFor(iso){
+    var idx = autoCodeIndexFor(state.myTeam, iso);
+    return state.codes[idx] ? state.codes[idx].id : null;
+  }
+
+  function entryFor(iso){
+    var ov = state.overrides[iso];
+    var codeId = (ov && ov.code !== undefined && ov.code !== null) ? ov.code : autoCodeFor(iso);
+    return {
+      codeId: codeId,
+      support: !!(ov && ov.support),
+      leave: !!(ov && ov.leave),
+      leaveTypeId: (ov && ov.leaveTypeId) || null,
+      leaveAmount: (ov && typeof ov.leaveAmount==="number") ? ov.leaveAmount : 1,
+      memo: (ov && ov.memo) ? ov.memo : ""
+    };
+  }
+
+  // ---------- Calendar rendering ----------
+  function renderMonthTitle(){ document.getElementById("mTitle").textContent = view.y + "년 " + (view.m+1) + "월"; }
+  function hexToSoft(hex){
+    try{ var r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+      return "rgba("+r+","+g+","+b+",0.16)"; }catch(e){ return "rgba(0,0,0,0.08)"; }
+  }
+
+  function renderGrid(){
+    var grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    var first = new Date(view.y, view.m, 1);
+    var startWeekday = first.getDay();
+    var daysInMonth = new Date(view.y, view.m+1, 0).getDate();
+    var todayStr = todayISO();
+
+    for(var i=0;i<startWeekday;i++){ var pd=document.createElement("div"); pd.className="cell empty"; grid.appendChild(pd); }
+
+    for(var d=1; d<=daysInMonth; d++){
+      var iso = view.y+"-"+pad2(view.m+1)+"-"+pad2(d);
+      var wd = new Date(view.y, view.m, d).getDay();
+      var hname = holidayName(iso);
+      var ent = entryFor(iso);
+      var cls = "cell" + (wd===0?" sun":"") + (wd===6?" sat":"") + (hname?" holiday":"") + (iso===todayStr?" today":"");
+      if(ent.leave) cls += " leave-day";
+      var cell = document.createElement("div");
+      cell.className = cls;
+      cell.setAttribute("data-iso", iso);
+      if(hname) cell.title = hname;
+
+      var dEl = document.createElement("div"); dEl.className="d num"; dEl.textContent=d;
+      if(ent.support){
+        var drow=document.createElement("div"); drow.className="drow";
+        var sl=document.createElement("span"); sl.className="sdot";
+        var sr=document.createElement("span"); sr.className="sdot";
+        drow.appendChild(sl); drow.appendChild(dEl); drow.appendChild(sr);
+        cell.appendChild(drow);
+      } else { cell.appendChild(dEl); }
+
+      var tag = document.createElement("div");
+      tag.className = "tag";
+      if(ent.leave){
+        tag.textContent = "휴가";
+        var restColor = (state.codes[3] && state.codes[3].color) || "#9a938a";
+        tag.style.background = hexToSoft(restColor);
+        tag.style.color = restColor;
+      } else {
+        var code = ent.codeId ? codeById(ent.codeId) : null;
+        if(code){
+          var label = code.name;
+          if(ent.support){
+            if(code.id==="c2") label = "야지";      // 비번 + 지원근무 = 야간지원근무
+            else if(code.id==="c3") label = "주지";  // 휴무 + 지원근무 = 주간지원근무
+          }
+          tag.textContent = label; tag.style.background = hexToSoft(code.color); tag.style.color = code.color;
+        }
+      }
+      if(tag.textContent) cell.appendChild(tag);
+
+      if(ent.memo){
+        var memoWrap = document.createElement("div"); memoWrap.className="memo-text";
+        var CHARS_PER_LINE = 5, MAX_LINES = 2;
+        var chars = Array.from(ent.memo); // code-point safe, so no char is split/miscounted
+        var mlines = [];
+        var cur = "";
+        var ci = 0;
+        while(ci < chars.length && mlines.length < MAX_LINES){
+          var ch = chars[ci]; ci++;
+          if(ch === "\n"){ mlines.push(cur); cur=""; continue; } // 사용자가 입력한 줄바꿈은 그대로 줄바꿈으로 반영
+          cur += ch;
+          if(cur.length >= CHARS_PER_LINE){ mlines.push(cur); cur=""; }
+        }
+        if(mlines.length < MAX_LINES && cur !== ""){ mlines.push(cur); cur=""; }
+        var memoHasMore = ci < chars.length;
+        if(memoHasMore){
+          if(mlines.length===0) mlines.push("…");
+          else mlines[mlines.length-1] = mlines[mlines.length-1] + "…";
+        }
+        mlines.forEach(function(text){
+          var lEl=document.createElement("div"); lEl.className="memo-line"; lEl.textContent=text; memoWrap.appendChild(lEl);
+        });
+        cell.appendChild(memoWrap);
+      }
+
+
+      cell.addEventListener("click", function(){ openDaySheet(this.getAttribute("data-iso")); });
+      grid.appendChild(cell);
+    }
+  }
+
+
+  function renderLeaveScroll(){
+    var wrap = document.getElementById("headerLeaves");
+    wrap.innerHTML = "";
+    allLeaveTypes().forEach(function(t){
+      var used = leaveUsedByType(t.id, t.resetsYearly);
+      var remain = Math.round((t.total-used)*10)/10;
+      var pc = pastelColor(t.colorIdx);
+      var pill=document.createElement("div"); pill.className="hl-pill"; pill.setAttribute("data-id", t.id);
+      pill.style.background = pc.tint; pill.style.borderColor = pc.border;
+      var dot=document.createElement("div"); dot.className="dot"; dot.style.background=pc.dot; pill.appendChild(dot);
+      var nm=document.createElement("span"); nm.textContent=t.name; pill.appendChild(nm);
+      var n=document.createElement("span"); n.className="n num"; n.textContent=remain; pill.appendChild(n);
+      attachDrag(pill, pill, ".hl-pill", function(ids){ state.leaveOrder = ids; saveState(); renderLeaveScroll(); });
+      wrap.appendChild(pill);
+    });
+  }
+
+  function renderStats(){
+    var daysInMonth = new Date(view.y, view.m+1, 0).getDate();
+    var workDays=0, support=0, leaveDays=0;
+    for(var d=1; d<=daysInMonth; d++){
+      var iso = view.y+"-"+pad2(view.m+1)+"-"+pad2(d);
+      var ent = entryFor(iso);
+      if(!ent.leave && ent.codeId){
+        var code = codeById(ent.codeId);
+        if(code && code.name!=="비번" && code.name!=="휴무"){ workDays++; }
+      }
+      if(ent.support) support++;
+      if(ent.leave) leaveDays += (ent.leaveAmount||1);
+    }
+    document.getElementById("statWork").innerHTML = workDays + "<small> 일</small>";
+    document.getElementById("statSupport").innerHTML = support + "<small> 회</small>";
+    document.getElementById("statLeave").innerHTML = (Math.round(leaveDays*10)/10) + "<small> 일</small>";
+  }
+
+  function renderCalendarAll(){
+    document.getElementById("teamBadge").textContent = state.myTeam + "반";
+    renderMonthTitle(); renderGrid(); renderStats(); renderLeaveScroll();
+  }
+
+  // ---------- Day sheet ----------
+  var WD_KO = ["일","월","화","수","목","금","토"];
+  function openDaySheet(iso){
+    openDayIso = iso;
+    var parts = iso.split("-");
+    var dt = new Date(+parts[0], +parts[1]-1, +parts[2]);
+    document.getElementById("sheetDate").textContent = (+parts[1])+"월 "+(+parts[2])+"일 ("+WD_KO[dt.getDay()]+")";
+
+    var chipsWrap = document.getElementById("shiftChips");
+    chipsWrap.innerHTML = "";
+    var ent = entryFor(iso);
+    state.codes.forEach(function(c){
+      var b=document.createElement("button"); b.type="button"; b.textContent=c.name; b.setAttribute("data-code", c.id);
+      if(ent.codeId===c.id){ b.classList.add("sel"); b.style.background=c.color; b.style.borderColor=c.color; }
+      b.addEventListener("click", function(){
+        chipsWrap.querySelectorAll("button").forEach(function(x){ x.classList.remove("sel"); x.style.background=""; x.style.borderColor=""; });
+        this.classList.add("sel"); this.style.background=c.color; this.style.borderColor=c.color;
+        chipsWrap.setAttribute("data-selected", c.id);
+      });
+      chipsWrap.appendChild(b);
+    });
+    chipsWrap.setAttribute("data-selected", ent.codeId || "");
+
+    document.getElementById("supportToggle").checked = !!ent.support;
+    document.getElementById("leaveToggle").checked = !!ent.leave;
+    document.getElementById("memoInput").value = ent.memo || "";
+
+    var typeSel = document.getElementById("leaveTypeSelect");
+    typeSel.innerHTML = "";
+    allLeaveTypes().forEach(function(t){
+      var opt=document.createElement("option"); opt.value=t.id;
+      var used = leaveUsedByType(t.id, t.resetsYearly);
+      var remain = Math.round((t.total-used)*10)/10;
+      opt.textContent = t.name + " (잔여 " + remain + "일)";
+      if(ent.leaveTypeId===t.id) opt.selected = true;
+      typeSel.appendChild(opt);
+    });
+    document.getElementById("leaveAmount").value = ent.leaveAmount || 1;
+    document.getElementById("leaveDetail").hidden = !ent.leave;
+
+    document.getElementById("dayOverlay").hidden = false;
+  }
+  function closeDaySheet(){ document.getElementById("dayOverlay").hidden = true; openDayIso = null; }
+
+  document.getElementById("sheetClose").addEventListener("click", closeDaySheet);
+  document.getElementById("dayOverlay").addEventListener("click", function(e){ if(e.target===this) closeDaySheet(); });
+  document.getElementById("leaveToggle").addEventListener("change", function(){
+    document.getElementById("leaveDetail").hidden = !this.checked;
+  });
+
+  document.getElementById("saveDayBtn").addEventListener("click", function(){
+    if(!openDayIso) return;
+    var chipsWrap = document.getElementById("shiftChips");
+    var chosen = chipsWrap.getAttribute("data-selected") || null;
+    var auto = autoCodeFor(openDayIso);
+    var support = document.getElementById("supportToggle").checked;
+    var leave = document.getElementById("leaveToggle").checked;
+    var leaveTypeId = document.getElementById("leaveTypeSelect").value;
+    var leaveAmount = parseFloat(document.getElementById("leaveAmount").value) || 1;
+    var memo = document.getElementById("memoInput").value.trim();
+
+    var needsOverride = (chosen !== auto) || support || leave || memo;
+    if(needsOverride){
+      state.overrides[openDayIso] = {
+        code: chosen, support: support, leave: leave,
+        leaveTypeId: leave ? leaveTypeId : null,
+        leaveAmount: leave ? leaveAmount : 1,
+        memo: memo
+      };
+    } else { delete state.overrides[openDayIso]; }
+    saveState(); renderCalendarAll(); closeDaySheet();
+  });
+  document.getElementById("resetDayBtn").addEventListener("click", function(){
+    if(!openDayIso) return;
+    delete state.overrides[openDayIso];
+    saveState(); renderCalendarAll(); closeDaySheet();
+  });
+
+  // ---------- Nav ----------
+  document.getElementById("prevM").addEventListener("click", function(){ view.m--; if(view.m<0){view.m=11; view.y--;} renderCalendarAll(); });
+  document.getElementById("nextM").addEventListener("click", function(){ view.m++; if(view.m>11){view.m=0; view.y++;} renderCalendarAll(); });
+  document.getElementById("todayBtn").addEventListener("click", function(){ var n=new Date(); view.y=n.getFullYear(); view.m=n.getMonth(); renderCalendarAll(); });
+
+  // ---------- View switch ----------
+  function showView(target){
+    document.getElementById("view-cal").classList.toggle("active", target==="cal");
+    document.getElementById("view-settings").classList.toggle("active", target==="settings");
+    if(target==="settings") renderSettings();
+  }
+  function toggleView(){
+    var isSettings = document.getElementById("view-settings").classList.contains("active");
+    if(isSettings){ showView("cal"); renderCalendarAll(); }
+    else { showView("settings"); }
+    updateScrollLock();
+  }
+  document.getElementById("settingsOpenBtn").addEventListener("click", toggleView);
+  document.getElementById("settingsBackBtn").addEventListener("click", toggleView);
+
+  // ---------- 화면 고정(휴가/현황 패널을 펼쳤을 때만 스크롤 허용) ----------
+  function updateScrollLock(){
+    var calActive = document.getElementById("view-cal").classList.contains("active");
+    var panelOpen = !document.getElementById("summaryPanel").hidden;
+    document.body.classList.toggle("locked", calActive && !panelOpen);
+  }
+  var summaryToggleBtn = document.getElementById("summaryToggle");
+  var summaryPanelEl = document.getElementById("summaryPanel");
+  summaryToggleBtn.addEventListener("click", function(){
+    summaryPanelEl.hidden = !summaryPanelEl.hidden;
+    summaryToggleBtn.classList.toggle("open", !summaryPanelEl.hidden);
+    updateScrollLock();
+  });
+
+  // ---------- Settings ----------
+  function renderFontList(){
+    var wrap = document.getElementById("fontList");
+    wrap.innerHTML = "";
+    Object.keys(FONTS).forEach(function(key){
+      var f = FONTS[key];
+      var b = document.createElement("button"); b.type="button";
+      b.className = "font-opt" + (state.font===key ? " sel" : "");
+      b.style.fontFamily = f.main;
+      var n = document.createElement("div"); n.className="fo-name"; n.textContent=f.label; b.appendChild(n);
+      var sm = document.createElement("div"); sm.className="fo-sample"; sm.textContent="주간 야간 비번 휴무 · 0123456789 · 병원 예약"; b.appendChild(sm);
+      b.addEventListener("click", function(){ state.font=key; saveState(); applyFont(); renderFontList(); });
+      wrap.appendChild(b);
+    });
+  }
+  function renderSettings(){
+    renderTeamChips();
+    document.getElementById("dirToggle").checked = !!state.reverseDir;
+    updateAnchorHint();
+    renderCodeList();
+    renderFontList();
+    document.getElementById("annualTotal").value = state.annualTotal;
+    document.getElementById("promotedFixed").value = state.promotedFixed;
+    renderLeaveTypeList();
+  }
+
+  function updateAnchorHint(){
+    var a = state.anchor;
+    var code = state.codes[a.codeIndex];
+    document.getElementById("anchorHint").textContent =
+      a.date + " 기준 " + a.team + "반 = " + (code?code.name:"?") + " (이 기준으로 다른 반·날짜 근무형태가 자동 계산돼요)";
+  }
+
+  function renderTeamChips(){
+    var wrap = document.getElementById("teamChips");
+    wrap.innerHTML = "";
+    TEAMS.forEach(function(t){
+      var b=document.createElement("button"); b.type="button"; b.textContent=t+"반";
+      if(state.myTeam===t) b.classList.add("sel");
+      b.addEventListener("click", function(){ state.myTeam = t; saveState(); renderTeamChips(); renderCalendarAll(); });
+      wrap.appendChild(b);
+    });
+  }
+
+  document.getElementById("dirToggle").addEventListener("change", function(){
+    state.reverseDir = this.checked; saveState(); renderCalendarAll();
+  });
+
+  function renderCodeList(){
+    var wrap = document.getElementById("codeList");
+    wrap.innerHTML = "";
+    state.codes.forEach(function(c, i){
+      var row=document.createElement("div"); row.className="code-edit";
+      var idx=document.createElement("div"); idx.className="idx num"; idx.textContent=(i+1); row.appendChild(idx);
+      var color=document.createElement("input"); color.type="color"; color.value=c.color;
+      color.addEventListener("input", function(){ c.color=this.value; saveState(); renderGrid(); });
+      row.appendChild(color);
+      var nameInput=document.createElement("input"); nameInput.type="text"; nameInput.value=c.name;
+      nameInput.addEventListener("input", function(){ c.name=this.value||c.id; saveState(); renderGrid(); updateAnchorHint(); });
+      row.appendChild(nameInput);
+      wrap.appendChild(row);
+    });
+    var hint=document.createElement("p"); hint.className="hint";
+    hint.textContent="4일 주기 순서예요(1→2→3→4→1...). 이름과 색상만 바꿀 수 있어요.";
+    wrap.appendChild(hint);
+  }
+
+  document.getElementById("annualTotal").addEventListener("input", function(){
+    var v=parseFloat(this.value); state.annualTotal=isNaN(v)?0:v; saveState();
+    renderStats(); renderLeaveScroll();
+  });
+  document.getElementById("promotedFixed").addEventListener("input", function(){
+    var v=parseFloat(this.value); state.promotedFixed=isNaN(v)?0:v; saveState();
+    renderStats(); renderLeaveScroll();
+  });
+
+  function bucketMini(labelPrefix, bucketObj, onTotal, onExpiry){
+    var wrap=document.createElement("div"); wrap.className="bucket-mini";
+    var f1=document.createElement("div"); f1.className="bm-count";
+    var l1=document.createElement("label"); l1.textContent=labelPrefix+" 개수"; f1.appendChild(l1);
+    var in1=document.createElement("input"); in1.type="number"; in1.min="0"; in1.step="0.5"; in1.value=bucketObj.total||0;
+    if(onTotal) in1.addEventListener("input", function(){ var v=parseFloat(this.value); onTotal(isNaN(v)?0:v); });
+    else { in1.readOnly = true; in1.disabled = true; }
+    f1.appendChild(in1);
+
+    var f2=document.createElement("div"); f2.className="bm-expiry";
+    var l2=document.createElement("label"); l2.textContent="만료일"; f2.appendChild(l2);
+    var expWrap=document.createElement("div"); expWrap.className="bm-expiry-row";
+    var parsed = parseExpiry(bucketObj.expiry);
+
+    var inY=document.createElement("input"); inY.type="number"; inY.min="0"; inY.max="99"; inY.placeholder="26";
+    inY.className="bm-year"; inY.value = parsed.yy;
+    var yrSuffix=document.createElement("span"); yrSuffix.className="bm-yr-suffix"; yrSuffix.textContent="년";
+
+    var selP=document.createElement("select"); selP.className="bm-preset";
+    EXPIRY_PRESETS.forEach(function(p){
+      var opt=document.createElement("option"); opt.value=p.v; opt.textContent=p.label;
+      if(p.v===parsed.preset) opt.selected=true;
+      selP.appendChild(opt);
+    });
+
+    function emit(){
+      var yy = inY.value;
+      if(yy==="" || isNaN(parseInt(yy,10))){ onExpiry(""); return; }
+      var yyNum = parseInt(yy,10);
+      var full = (yyNum<100 ? (2000+yyNum) : yyNum);
+      onExpiry(full+"-"+selP.value);
+    }
+
+    if(onExpiry){
+      inY.addEventListener("input", emit);
+      selP.addEventListener("change", emit);
+    } else {
+      inY.readOnly = true; inY.disabled = true;
+      selP.disabled = true;
+    }
+    expWrap.appendChild(inY); expWrap.appendChild(yrSuffix); expWrap.appendChild(selP);
+    f2.appendChild(expWrap);
+
+    wrap.appendChild(f1); wrap.appendChild(f2);
+    return wrap;
+  }
+
+  function renderLeaveTypeList(){
+    var wrapCarry = document.getElementById("leaveTypeListCarry");
+    var wrapPlain = document.getElementById("leaveTypeListPlain");
+    wrapCarry.innerHTML = ""; wrapPlain.innerHTML = "";
+    var types = allLeaveTypes(true); // 설정 화면은 메인 화면의 순서와 별개
+
+    types.forEach(function(t){
+      var card=document.createElement("div"); card.className="type-card"; card.setAttribute("data-id", t.id);
+      var pc = pastelColor(t.colorIdx);
+      card.style.background = pc.tint;
+      card.style.borderColor = pc.border;
+
+      var thead=document.createElement("div"); thead.className="thead";
+      var dot=document.createElement("div"); dot.className="dot"; dot.style.background=pc.dot; thead.appendChild(dot);
+
+      if(t.special){
+        var nm=document.createElement("div"); nm.className="tname"; nm.textContent=t.name; thead.appendChild(nm);
+      } else {
+        var idx = state.leaveTypes.findIndex(function(x){ return x.id===t.id; });
+        var nameInput=document.createElement("input"); nameInput.type="text"; nameInput.value=t.name;
+        nameInput.addEventListener("input", function(){ state.leaveTypes[idx].name=this.value||t.id; saveState(); renderLeaveScroll(); });
+        thead.appendChild(nameInput);
+        var del=document.createElement("button"); del.className="del"; del.type="button"; del.textContent="✕";
+        del.addEventListener("click", function(){ state.leaveTypes.splice(idx,1); saveState(); renderLeaveTypeList(); renderLeaveScroll(); });
+        thead.appendChild(del);
+      }
+      card.appendChild(thead);
+
+      if(t.id==="yeoncha"){
+        var s1=document.createElement("div"); s1.className="sub"; s1.textContent="올해분 (자동계산)"; card.appendChild(s1);
+        card.appendChild(bucketMini("올해", t.b1, null, function(v){ state.annualExpiry=v; saveState(); renderLeaveScroll(); }));
+        var s2=document.createElement("div"); s2.className="sub"; s2.textContent="내년 이월분"; card.appendChild(s2);
+        card.appendChild(bucketMini("내년", t.b2, function(v){ state.annualCarry.total=v; saveState(); renderLeaveScroll(); }, function(v){ state.annualCarry.expiry=v; saveState(); renderLeaveScroll(); }));
+      } else if(t.id==="chokjin"){
+        var s3=document.createElement("div"); s3.className="sub"; s3.textContent="자동계산 (연차에서 분리)"; card.appendChild(s3);
+        card.appendChild(bucketMini("촉진", t.b1, null, function(v){ state.promotedExpiry=v; saveState(); renderLeaveScroll(); }));
+      } else {
+        var idx2 = state.leaveTypes.findIndex(function(x){ return x.id===t.id; });
+        if(t.carryOver){
+          var s4=document.createElement("div"); s4.className="sub"; s4.textContent="올해 만료분"; card.appendChild(s4);
+          card.appendChild(bucketMini("올해", t.b1,
+            function(v){ state.leaveTypes[idx2].total=v; saveState(); renderLeaveScroll(); },
+            function(v){ state.leaveTypes[idx2].expiry=v; saveState(); renderLeaveScroll(); }));
+          var s5=document.createElement("div"); s5.className="sub"; s5.textContent="내년 만료분(이월)"; card.appendChild(s5);
+          card.appendChild(bucketMini("내년", t.b2,
+            function(v){ state.leaveTypes[idx2].totalNext=v; saveState(); renderLeaveScroll(); },
+            function(v){ state.leaveTypes[idx2].expiryNext=v; saveState(); renderLeaveScroll(); }));
+        } else {
+          card.appendChild(bucketMini("", t.b1,
+            function(v){ state.leaveTypes[idx2].total=v; saveState(); renderLeaveScroll(); },
+            function(v){ state.leaveTypes[idx2].expiry=v; saveState(); renderLeaveScroll(); }));
+        }
+      }
+
+      (t.carryOver ? wrapCarry : wrapPlain).appendChild(card);
+    });
+  }
+  // 휴가 순서 드래그 (터치/마우스 공용, 같은 그룹 안에서 이동)
+  // 드래그 중에는 DOM을 옮기지 않고 카드를 손가락에 따라 움직이기만 해서 터치가 끊기지 않게 함
+  function attachDrag(handle, card, cls, commit){
+    handle.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+    handle.addEventListener("pointerdown", function(e){
+      e.preventDefault();
+      var parent = card.parentNode;
+      var sx = e.clientX, sy = e.clientY, target = null;
+      try{ handle.setPointerCapture(e.pointerId); }catch(err){}
+      card.classList.add("dragging");
+      function findTarget(x, y){
+        var els = document.elementsFromPoint(x, y);
+        for(var i=0;i<els.length;i++){
+          var c = els[i].closest ? els[i].closest(cls) : null;
+          if(c && c!==card && c.parentNode===parent) return c;
+        }
+        return null;
+      }
+      function move(ev){
+        card.style.transform = "translate("+(ev.clientX-sx)+"px,"+(ev.clientY-sy)+"px) scale(1.03)";
+        var t = findTarget(ev.clientX, ev.clientY);
+        if(t!==target){
+          if(target) target.classList.remove("drop-target");
+          target = t;
+          if(target) target.classList.add("drop-target");
+        }
+      }
+      function end(){
+        handle.removeEventListener("pointermove", move);
+        handle.removeEventListener("pointerup", end);
+        handle.removeEventListener("pointercancel", end);
+        try{ handle.releasePointerCapture(e.pointerId); }catch(err){}
+        card.classList.remove("dragging");
+        card.style.transform = "";
+        if(target) target.classList.remove("drop-target");
+        if(!target) return;
+        var ids = Array.prototype.slice.call(parent.children).map(function(c){ return c.getAttribute("data-id"); });
+        var from = ids.indexOf(card.getAttribute("data-id"));
+        var to = ids.indexOf(target.getAttribute("data-id"));
+        ids.splice(from, 1);
+        ids.splice(to, 0, card.getAttribute("data-id"));
+        commit(ids);
+      }
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", end);
+      handle.addEventListener("pointercancel", end);
+    });
+  }
+  document.getElementById("addLeaveTypeCarry").addEventListener("click", function(){
+    state.leaveTypes.push({ id:"lt"+Date.now(), name:"새 휴가", total:0, expiry:"", totalNext:0, expiryNext:"", carryOver:true });
+    saveState(); renderLeaveTypeList();
+  });
+  document.getElementById("addLeaveTypePlain").addEventListener("click", function(){
+    state.leaveTypes.push({ id:"lt"+Date.now(), name:"새 휴가", total:0, expiry:"", totalNext:0, expiryNext:"", carryOver:false });
+    saveState(); renderLeaveTypeList();
+  });
+
+  // ---------- Backup / restore ----------
+  document.getElementById("exportBtn").addEventListener("click", async function(){
+    try{
+      var json = JSON.stringify(state, null, 2);
+      var blob = new Blob([json], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "shiftcal-backup-" + todayISO() + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    }catch(e){ alert("내보내기 중 문제가 발생했어요."); }
+  });
+  document.getElementById("importBtn").addEventListener("click", function(){ document.getElementById("importFile").click(); });
+  document.getElementById("importFile").addEventListener("change", function(e){
+    var file = e.target.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var data = JSON.parse(reader.result);
+        if(data && data.codes && data.anchor){
+          data.leaveTypes = (data.leaveTypes || []).map(migrateLeaveType);
+          if(typeof data.promotedFixed !== "number") data.promotedFixed = 8;
+          if(!data.annualCarry) data.annualCarry = { total:0, expiry:"" };
+          if(!data.font) data.font = "noto";
+          if(!Array.isArray(data.leaveOrder)) data.leaveOrder = [];
+          state = data; state.overrides = state.overrides || {};
+          applyFont();
+          saveState(); renderCalendarAll(); renderSettings();
+          alert("불러오기 완료");
+        } else { alert("올바른 백업 파일이 아니에요."); }
+      }catch(err){ alert("파일을 읽는 중 문제가 발생했어요."); }
+    };
+    reader.readAsText(file);
+  });
+
+  // ---------- 설정 섹션 접기/펴기 (기본: 접힘) ----------
+  (function(){
+    var root = document.getElementById("view-settings");
+    var heads = Array.prototype.slice.call(root.querySelectorAll("h2.st"));
+    heads.forEach(function(h){
+      var body = document.createElement("div"); body.className="sec-body"; body.hidden = true;
+      var n = h.nextSibling;
+      while(n && !(n.nodeType===1 && n.matches && n.matches("h2.st"))){
+        var nx = n.nextSibling; body.appendChild(n); n = nx;
+      }
+      h.parentNode.insertBefore(body, n);
+      h.setAttribute("role","button"); h.setAttribute("tabindex","0");
+      var chev = document.createElementNS("http://www.w3.org/2000/svg","svg");
+      chev.setAttribute("class","chev"); chev.setAttribute("width","16"); chev.setAttribute("height","16"); chev.setAttribute("viewBox","0 0 24 24");
+      chev.setAttribute("fill","none"); chev.setAttribute("stroke","currentColor"); chev.setAttribute("stroke-width","2.5");
+      chev.setAttribute("stroke-linecap","round"); chev.setAttribute("stroke-linejoin","round");
+      var path = document.createElementNS("http://www.w3.org/2000/svg","path"); path.setAttribute("d","m6 9 6 6 6-6"); chev.appendChild(path);
+      h.appendChild(chev);
+      function toggle(){ body.hidden = !body.hidden; h.classList.toggle("open", !body.hidden); h.setAttribute("aria-expanded", String(!body.hidden)); }
+      h.addEventListener("click", toggle);
+      h.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
+      h.setAttribute("aria-expanded","false");
+    });
+  })();
+
+  // ---------- boot ----------
+  applyFont();
+  renderCalendarAll();
+  updateScrollLock();
+
+  // ---------- 오프라인 지원 (PWA 설치용 service worker) ----------
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
