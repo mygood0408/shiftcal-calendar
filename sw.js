@@ -1,12 +1,39 @@
 // 교대달력 service worker: 앱 파일을 기기에 저장해 오프라인에서도 열리게 합니다.
 // 파일을 수정해서 다시 배포할 때는 CACHE 이름의 버전 숫자를 올려주세요 (예: v2).
-const CACHE = "shiftcal-v2";
+const CACHE = "shiftcal-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./fonts/gowun-dodum/files/gowun-dodum-korean-400-normal.woff2",
+  "./fonts/gowun-dodum/files/gowun-dodum-latin-400-normal.woff2",
+  "./fonts/gowun-dodum/fonts.css",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-korean-400-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-korean-500-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-korean-600-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-korean-700-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-latin-400-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-latin-500-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-latin-600-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/files/ibm-plex-sans-kr-latin-700-normal.woff2",
+  "./fonts/ibm-plex-sans-kr/fonts.css",
+  "./fonts/jua/files/jua-korean-400-normal.woff2",
+  "./fonts/jua/files/jua-latin-400-normal.woff2",
+  "./fonts/jua/fonts.css",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-korean-400-normal.woff2",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-korean-500-normal.woff2",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-korean-700-normal.woff2",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-korean-900-normal.woff2",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-latin-400-normal.woff2",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-latin-500-normal.woff2",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-latin-700-normal.woff2",
+  "./fonts/noto-sans-kr/files/noto-sans-kr-latin-900-normal.woff2",
+  "./fonts/noto-sans-kr/fonts.css",
+  "./fonts/space-grotesk/files/space-grotesk-latin-500-normal.woff2",
+  "./fonts/space-grotesk/files/space-grotesk-latin-700-normal.woff2",
+  "./fonts/space-grotesk/fonts.css"
 ];
 
 self.addEventListener("install", (event) => {

@@ -7,12 +7,16 @@
 <meta name="theme-color" content="#1f5f7a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="교대달력">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&family=Gowun+Dodum&family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="fonts/noto-sans-kr/fonts.css">
+<link rel="stylesheet" href="fonts/space-grotesk/fonts.css">
+<link rel="stylesheet" href="fonts/gowun-dodum/fonts.css">
+<link rel="stylesheet" href="fonts/jua/fonts.css">
+<link rel="stylesheet" href="fonts/ibm-plex-sans-kr/fonts.css">
 <style>
   :root{
     --ink:#17212b; --ink-soft:#566676; --paper:#eef3f7; --card:#ffffff; --line:#d8e1e8;
@@ -203,6 +207,18 @@
     text-align:center;
   }
   [hidden]{ display:none !important; }
+  /* 처음 시작 화면 */
+  #view-onboard{ display:none; }
+  body.onboarding #view-onboard{ display:block; padding-bottom:96px; }
+  body.onboarding #view-cal, body.onboarding #view-settings, body.onboarding header.top{ display:none !important; }
+  .ob-title{ font-size:22px; font-weight:900; margin:18px 0 4px; letter-spacing:-.02em; }
+  .ob-sub{ font-size:13px; color:var(--ink-soft); margin:0 0 16px; line-height:1.5; }
+  .ob-h{ font-size:13px; color:var(--ink-soft); font-weight:700; margin:0 0 8px; }
+  .ob-restore{ border:1.5px solid var(--accent); }
+  .ob-restore b{ display:block; font-size:15px; color:var(--accent); margin-bottom:2px; }
+  .ob-restore small{ display:block; font-size:12px; color:var(--ink-soft); margin-bottom:10px; }
+  .ob-foot{ position:fixed; left:0; right:0; bottom:0; padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));
+    background:var(--paper); box-shadow:0 -4px 12px rgba(0,0,0,.06); }
   .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:20; display:flex; align-items:flex-end; }
   .sheet{ background:var(--paper); width:100%; border-radius:20px 20px 0 0; padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px)); max-height:88vh; overflow-y:auto; }
 </style>
@@ -213,6 +229,54 @@
   <h1>교대달력 <span class="team-badge" id="teamBadge">A반</span></h1>
   <button class="icon-btn" id="settingsOpenBtn" title="설정" style="margin-left:auto;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
 </header>
+
+<section class="view" id="view-onboard">
+  <h1 class="ob-title">교대달력 시작하기</h1>
+  <p class="ob-sub">아래 내용을 한 번에 채우면 바로 시작해요. 나중에 설정에서 언제든 바꿀 수 있어요.</p>
+
+  <div class="card ob-restore">
+    <b>백업 파일이 있나요?</b>
+    <small>가지고 있던 백업을 불러오면 기록(근무 수정, 휴가, 메모, 글꼴, 휴가 순서)이 그대로 옮겨져요.</small>
+    <button class="btn primary block" id="obRestoreBtn" type="button">백업 파일 불러오기</button>
+  </div>
+
+  <div class="card">
+    <h3 class="ob-h">근무 패턴</h3>
+    <div class="team-chips" id="obPatternChips"></div>
+  </div>
+
+  <div class="card" id="obTeamCard">
+    <h3 class="ob-h">내 반</h3>
+    <div class="team-chips" id="obTeamChips"></div>
+  </div>
+
+  <div class="card" id="obAnchorCard">
+    <h3 class="ob-h">기준 근무 (오늘 무슨 근무인지)</h3>
+    <div class="field">
+      <label>기준 날짜</label>
+      <input type="date" id="obDate">
+    </div>
+    <div class="field" style="margin-bottom:0;">
+      <label>그날 내 근무</label>
+      <select id="obCode"></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="ob-h">연차</h3>
+    <div class="field-inline">
+      <div class="field" style="margin-bottom:0;">
+        <label>연차 총 지급일수</label>
+        <input type="number" id="obAnnual" min="0" step="0.5" placeholder="직접 입력">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>촉진연차 개수</label>
+        <input type="number" id="obPromoted" min="0" step="0.5" placeholder="없으면 0">
+      </div>
+    </div>
+  </div>
+  <div class="ob-foot"><button class="btn primary block" id="obStartBtn" type="button">시작하기</button></div>
+</section>
 
 <section class="view active" id="view-cal">
   <div class="summary-toggle" id="summaryToggle">
@@ -255,8 +319,14 @@
     <h1>설정</h1>
   </div>
 
-  <h2 class="st">내 반</h2>
-  <div class="card">
+  <h2 class="st" id="patternHead">근무 패턴</h2>
+  <div class="card" id="patternCard">
+    <div class="team-chips" id="patternChips"></div>
+    <p class="hint" id="patternHint"></p>
+  </div>
+
+  <h2 class="st" id="teamHead">내 반</h2>
+  <div class="card" id="teamCard">
     <div class="team-chips" id="teamChips"></div>
     <p class="hint" id="anchorHint"></p>
     <div class="toggle-row" style="margin-top:10px;">
@@ -404,7 +474,8 @@
       {id:"c2", name:"비번", color:"#8a6bb0"},
       {id:"c3", name:"휴무", color:"#9a938a"}
     ],
-    anchor: { date: "2026-09-23", team: "A", codeIndex: 2 },
+    pattern: "shift4",   // "shift4" = 4조2교대, "weekday" = 일근(평일 근무·주말 휴식)
+    anchor: { date: todayISO(), team: "A", codeIndex: 0 }, // 처음 시작 화면에서 실제 값을 입력받음
     myTeam: "A",
     reverseDir: false,
     annualTotal: 15,
@@ -481,7 +552,7 @@
           if(old) s = JSON.parse(old);
         }
       }
-      if(!s || !s.codes || !s.anchor) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      if(!s || !s.codes || !s.anchor) return null; // 저장된 데이터가 없으면 처음 시작 화면
       s.overrides = s.overrides || {};
       s.leaveTypes = (s.leaveTypes || []).map(migrateLeaveType);
       if(typeof s.annualTotal !== "number") s.annualTotal = 0;
@@ -501,9 +572,10 @@
       if(typeof s.bucketYear !== "number") s.bucketYear = new Date().getFullYear();
       if(!s.font) s.font = "noto";
       if(!Array.isArray(s.leaveOrder)) s.leaveOrder = [];
+      if(s.pattern !== "weekday") s.pattern = "shift4"; // 옛 백업에는 pattern이 없으므로 4조2교대로 채움
       return s;
     }catch(e){
-      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      return null; // 깨진 데이터는 덮어쓰지 않고 처음 시작 화면으로 (아래 저장은 사용자가 시작하기를 누른 뒤에만 일어남)
     }
   }
   function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
@@ -533,8 +605,10 @@
     return changed;
   }
 
-  var state = loadState();
-  if(rollBucketsToCurrentYear(state)) saveState();
+  var saved = loadState();
+  var needsOnboarding = !saved;
+  var state = saved || JSON.parse(JSON.stringify(DEFAULT_STATE));
+  if(!needsOnboarding && rollBucketsToCurrentYear(state)) saveState();
   var view = { y: new Date().getFullYear(), m: new Date().getMonth() };
   var openDayIso = null;
 
@@ -614,6 +688,11 @@
     return idx;
   }
   function autoCodeFor(iso){
+    if(state.pattern === "weekday"){
+      // 일근: 평일 주간, 토·일·공휴일 휴무 (코드 id 기준)
+      var wd = new Date(iso+"T00:00:00").getDay();
+      return (wd===0 || wd===6 || holidayName(iso)) ? "c3" : "c0";
+    }
     var idx = autoCodeIndexFor(state.myTeam, iso);
     return state.codes[idx] ? state.codes[idx].id : null;
   }
@@ -757,7 +836,7 @@
   }
 
   function renderCalendarAll(){
-    document.getElementById("teamBadge").textContent = state.myTeam + "반";
+    document.getElementById("teamBadge").textContent = state.pattern === "weekday" ? "일근" : state.myTeam + "반";
     renderMonthTitle(); renderGrid(); renderStats(); renderLeaveScroll();
   }
 
@@ -863,7 +942,7 @@
   function updateScrollLock(){
     var calActive = document.getElementById("view-cal").classList.contains("active");
     var panelOpen = !document.getElementById("summaryPanel").hidden;
-    document.body.classList.toggle("locked", calActive && !panelOpen);
+    document.body.classList.toggle("locked", calActive && !panelOpen && !document.body.classList.contains("onboarding"));
   }
   var summaryToggleBtn = document.getElementById("summaryToggle");
   var summaryPanelEl = document.getElementById("summaryPanel");
@@ -888,7 +967,27 @@
       wrap.appendChild(b);
     });
   }
+  var PATTERNS = [
+    { id:"shift4", label:"4조2교대", hint:"4일 주기로 주간·야간·비번·휴무가 돌아가요. 반(A~D)을 고르세요." },
+    { id:"weekday", label:"일근", hint:"평일은 주간, 토·일·공휴일은 휴무로 자동 표시돼요." }
+  ];
+  function renderPatternChips(){
+    var wrap = document.getElementById("patternChips");
+    wrap.innerHTML = "";
+    PATTERNS.forEach(function(p){
+      var b=document.createElement("button"); b.type="button"; b.textContent=p.label;
+      if(state.pattern===p.id) b.classList.add("sel");
+      b.addEventListener("click", function(){ state.pattern = p.id; saveState(); renderSettings(); renderCalendarAll(); });
+      wrap.appendChild(b);
+    });
+    var cur = PATTERNS.filter(function(p){ return p.id===state.pattern; })[0];
+    document.getElementById("patternHint").textContent = cur.hint;
+  }
   function renderSettings(){
+    renderPatternChips();
+    var isShift = state.pattern !== "weekday";
+    document.getElementById("teamHead").hidden = !isShift;
+    document.getElementById("teamCard").hidden = !isShift;
     renderTeamChips();
     document.getElementById("dirToggle").checked = !!state.reverseDir;
     updateAnchorHint();
@@ -1111,23 +1210,29 @@
   });
 
   // ---------- Backup / restore ----------
+  function blobDownload(filename, text){
+    var blob = new Blob([text], { type:"application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename; a.style.display = "none";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+  }
   document.getElementById("exportBtn").addEventListener("click", async function(){
+    var filename = "shiftcal-backup-" + todayISO() + ".json";
+    var json = JSON.stringify(state, null, 2);
+    // 1) 일반 다운로드 (Blob)
+    try{ blobDownload(filename, json); return; }catch(e){}
+    // 2) 마지막 수단: 클립보드에 복사
     try{
-      var json = JSON.stringify(state, null, 2);
-      var blob = new Blob([json], { type: "application/json" });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = "shiftcal-backup-" + todayISO() + ".json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+      await navigator.clipboard.writeText(json);
+      alert("파일 저장이 막혀 있어서 백업 내용을 클립보드에 복사했어요. 메모장 등에 붙여넣어 보관하세요.");
     }catch(e){ alert("내보내기 중 문제가 발생했어요."); }
   });
   document.getElementById("importBtn").addEventListener("click", function(){ document.getElementById("importFile").click(); });
   document.getElementById("importFile").addEventListener("change", function(e){
     var file = e.target.files[0]; if(!file) return;
+    e.target.value = ""; // 같은 파일을 다시 골라도 change가 뜨도록 초기화
     var reader = new FileReader();
     reader.onload = function(){
       try{
@@ -1138,9 +1243,11 @@
           if(!data.annualCarry) data.annualCarry = { total:0, expiry:"" };
           if(!data.font) data.font = "noto";
           if(!Array.isArray(data.leaveOrder)) data.leaveOrder = [];
+          if(data.pattern !== "weekday") data.pattern = "shift4";
           state = data; state.overrides = state.overrides || {};
           applyFont();
           saveState(); renderCalendarAll(); renderSettings();
+          if(document.body.classList.contains("onboarding")) finishOnboarding();
           alert("불러오기 완료");
         } else { alert("올바른 백업 파일이 아니에요."); }
       }catch(err){ alert("파일을 읽는 중 문제가 발생했어요."); }
@@ -1173,18 +1280,69 @@
     });
   })();
 
+  // ---------- 처음 시작 화면 ----------
+  function renderObForm(){
+    var pw = document.getElementById("obPatternChips"); pw.innerHTML = "";
+    PATTERNS.forEach(function(p){
+      var b = document.createElement("button"); b.type="button"; b.textContent = p.label;
+      if(obState.pattern === p.id) b.classList.add("sel");
+      b.addEventListener("click", function(){ obState.pattern = p.id; renderObForm(); });
+      pw.appendChild(b);
+    });
+    var tw = document.getElementById("obTeamChips"); tw.innerHTML = "";
+    TEAMS.forEach(function(t){
+      var b = document.createElement("button"); b.type="button"; b.textContent = t + "반";
+      if(obState.team === t) b.classList.add("sel");
+      b.addEventListener("click", function(){ obState.team = t; renderObForm(); });
+      tw.appendChild(b);
+    });
+    var isShift = obState.pattern !== "weekday";
+    document.getElementById("obTeamCard").hidden = !isShift;
+    document.getElementById("obAnchorCard").hidden = !isShift;
+  }
+  var obState = { pattern: "shift4", team: "A" };
+  function finishOnboarding(){
+    document.body.classList.remove("onboarding");
+    showView("cal"); renderCalendarAll(); updateScrollLock();
+  }
+  function initObFields(){
+    var sel = document.getElementById("obCode"); sel.innerHTML = "";
+    state.codes.forEach(function(c, i){ var o = document.createElement("option"); o.value = i; o.textContent = c.name; sel.appendChild(o); });
+    sel.value = "0";
+    document.getElementById("obDate").value = todayISO();
+    // 연차 값은 사람마다 다르므로 미리 채우지 않고 직접 입력받는다
+    document.getElementById("obAnnual").value = "";
+    document.getElementById("obPromoted").value = "";
+    renderObForm();
+  }
+  document.getElementById("obRestoreBtn").addEventListener("click", function(){ document.getElementById("importFile").click(); });
+  document.getElementById("obStartBtn").addEventListener("click", function(){
+    var date = document.getElementById("obDate").value;
+    var annual = parseFloat(document.getElementById("obAnnual").value);
+    var promoted = parseFloat(document.getElementById("obPromoted").value);
+    if(obState.pattern !== "weekday" && !/^\d{4}-\d{2}-\d{2}$/.test(date)){ alert("기준 날짜를 골라 주세요."); return; }
+    if(document.getElementById("obAnnual").value.trim() === "" || isNaN(annual) || annual < 0){ alert("연차 총 지급일수를 입력해 주세요. 없으면 0을 적으세요."); return; }
+    state.pattern = obState.pattern;
+    state.myTeam = obState.team;
+    state.anchor = { date: date || todayISO(), team: obState.team, codeIndex: parseInt(document.getElementById("obCode").value, 10) || 0 };
+    state.annualTotal = annual;
+    state.promotedFixed = isNaN(promoted) ? 0 : promoted;
+    state.bucketYear = new Date().getFullYear();
+    saveState();
+    finishOnboarding();
+  });
+
   // ---------- boot ----------
   applyFont();
+  if(needsOnboarding){ document.body.classList.add("onboarding"); initObFields(); }
   renderCalendarAll();
   updateScrollLock();
-
-  // ---------- 오프라인 지원 (PWA 설치용 service worker) ----------
-  if("serviceWorker" in navigator){
-    window.addEventListener("load", function(){
-      navigator.serviceWorker.register("sw.js").catch(function(){});
-    });
-  }
 })();
+
+// 오프라인 사용을 위한 service worker 등록 (파일 수정 후에는 sw.js의 CACHE 버전을 올릴 것)
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+}
 </script>
 </body>
 </html>

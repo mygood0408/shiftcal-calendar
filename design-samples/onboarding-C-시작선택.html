@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>처음 시작 C — 시작 선택</title>
+<style>
+:root{--ink:#17212b;--ink-soft:#566676;--paper:#eef3f7;--card:#fff;--line:#d8e1e8;--accent:#1f5f7a;--on-accent:#fff;--shadow:0 1px 2px rgba(23,33,43,.06),0 6px 16px rgba(23,33,43,.06)}
+*{box-sizing:border-box}body{margin:0;background:#cfd8e0;font-family:"Noto Sans KR",sans-serif;color:var(--ink)}
+.phone{width:375px;height:812px;margin:20px auto;background:var(--paper);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.25);position:relative}
+.hero{padding:70px 24px 12px}
+.logo{width:56px;height:56px;border-radius:16px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;margin-bottom:18px}
+h1{font-size:24px;margin:0 0 8px;font-weight:900;letter-spacing:-.02em}
+.sub{font-size:14px;color:var(--ink-soft);line-height:1.5;margin:0}
+.choices{padding:24px;display:flex;flex-direction:column;gap:12px}
+.big{background:var(--card);border-radius:18px;padding:18px;box-shadow:var(--shadow);border:1.5px solid var(--line);text-align:left}
+.big b{display:block;font-size:17px;margin-bottom:4px}.big small{font-size:13px;color:var(--ink-soft)}
+.big.main{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}.big.main small{color:#d6eaf2}
+.tag{display:inline-block;font-size:11px;font-weight:700;background:#fff;color:var(--accent);border-radius:20px;padding:2px 8px;margin-bottom:8px}
+.note{margin:auto 24px 30px;font-size:12px;color:var(--ink-soft);line-height:1.5}
+</style></head><body>
+<div class="phone">
+  <div class="hero">
+    <div class="logo">교</div>
+    <h1>교대달력</h1>
+    <p class="sub">교대 근무표와 휴가를 한 달에 한눈에.<br>기록은 이 기기에만 저장돼요.</p>
+  </div>
+  <div class="choices">
+    <button class="big main"><span class="tag">기존 사용자</span><b>백업 파일로 시작</b><small>가지고 있던 백업(JSON)을 불러와요</small></button>
+    <button class="big"><b>새로 시작</b><small>근무 패턴과 기준 날짜만 입력해요 (약 1분)</small></button>
+  </div>
+  <div class="note">백업을 불러오면 기존 기록(근무 수정, 휴가, 메모, 글꼴, 휴가 순서)이 그대로 옮겨져요.</div>
+</div>
+</body></html>
