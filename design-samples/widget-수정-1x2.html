@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1×2 수정안 4</title>
+<style>
+body{margin:0;background:#cfd8e0;font-family:"Noto Sans KR",sans-serif;padding:28px;display:flex;flex-direction:column;gap:14px;align-items:center}
+h2{margin:0;font-size:18px;color:#17212b}
+.cap{font-size:13px;color:#566676;text-align:center;margin:4px 0 0}
+/* 1x2: 위·아래 칸 크기와 디자인 완전히 동일, 흰 배경 */
+.w{width:160px;height:330px;border-radius:24px;box-sizing:border-box;padding:10px;display:flex;flex-direction:column;gap:10px;background:#ffffff;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.cellbox{flex:1;min-height:0;border-radius:18px;box-sizing:border-box;padding:12px;display:flex;flex-direction:column;gap:4px;overflow:hidden;background:#ffffff;border:2px solid}
+.date{font-size:13px;font-weight:700;color:#566676}
+.code{font-size:17px;font-weight:900;line-height:1.1}
+.list{font-size:11px;line-height:1.4;color:#000;margin-top:4px}
+.list div::before{content:"· "}
+</style></head><body>
+<h2>1×2 수정안 4 — 흰 배경, 칸 테두리 = 근무 색</h2>
+<div>
+  <div class="w">
+    <div class="cellbox" style="border-color:#000">
+      <div class="date">11/26 목</div>
+      <div class="code" style="color:#000">주간</div>
+      <div class="list"><div>치과 예약 14:00</div><div>하진이 생일</div></div>
+    </div>
+    <div class="cellbox" style="border-color:#33517e">
+      <div class="date">11/27 금</div>
+      <div class="code" style="color:#33517e">야간</div>
+      <div class="list"><div>팀 회식 19:00</div></div>
+    </div>
+  </div>
+  <p class="cap">위: 주간(검정) · 아래: 야간(남색) — 테두리와 글자 모두 근무 색</p>
+</div>
+</body></html>

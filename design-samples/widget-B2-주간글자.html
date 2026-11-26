@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>위젯 B(새안) — 주간 글자 띠</title>
+<style>
+body{margin:0;background:#dfe6ec;font-family:"Noto Sans KR",sans-serif;display:flex;flex-direction:column;align-items:center;gap:16px;padding:28px;color:#17212b}
+h2{margin:0;font-size:18px}p{margin:0;font-size:13px;color:#566676}
+/* 4x1 위젯 */
+.w{width:330px;height:150px;border-radius:24px;background:#17212b;box-shadow:0 8px 20px rgba(0,0,0,.25);padding:16px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
+.top{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#aab6c2}
+.row{display:flex;gap:6px}
+.s{flex:1;height:64px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900}
+.s b{font-size:20px}.s small{font-size:10px;opacity:.85;font-weight:700}
+.a{background:#3f7d5c}.b{background:#33517e}.c{background:#8a6bb0}.e{background:#5b5750}
+.now{outline:2px solid #fff;outline-offset:2px}
+</style></head><body>
+<h2>위젯 B 새안 — 주간 글자 띠 (4×1)</h2>
+<div class="w">
+  <div class="top"><span>이번 주</span><span>A반</span></div>
+  <div class="row">
+    <div class="s a"><small>월</small><b>주</b></div>
+    <div class="s b"><small>화</small><b>야</b></div>
+    <div class="s c"><small>수</small><b>비</b></div>
+    <div class="s e now"><small>목</small><b>휴</b></div>
+    <div class="s a"><small>금</small><b>주</b></div>
+    <div class="s e"><small>토</small><b>휴</b></div>
+    <div class="s e"><small>일</small><b>휴</b></div>
+  </div>
+</div>
+<p>짙은 배경, 글자 코드(주·야·비·휴). 오늘은 흰 테두리.</p>
+</body></html>

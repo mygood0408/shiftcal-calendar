@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1×2 위젯 C — 근무 색띠</title>
+<style>
+body{margin:0;background:#dfe6ec;font-family:"Noto Sans KR",sans-serif;display:flex;flex-direction:column;align-items:center;gap:16px;padding:28px;color:#17212b}
+h2{margin:0;font-size:18px}p{margin:0;font-size:13px;color:#566676;text-align:center}
+.w{width:160px;height:330px;border-radius:24px;background:#17212b;box-shadow:0 8px 20px rgba(0,0,0,.25);padding:14px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;color:#fff}
+.t{font-size:13px;font-weight:900}
+.band{flex:1;display:flex;gap:8px}
+.col{flex:1;border-radius:12px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:8px 0;font-size:11px;font-weight:700}
+.a{background:#3f7d5c}.b{background:#33517e}.c{background:#8a6bb0}.e{background:#5b5750}
+.col b{font-size:16px;font-weight:900}
+.now{outline:2px solid #fff;outline-offset:2px}
+</style></head><body>
+<h2>1×2 위젯 C — 근무 색띠 (세로 막대)</h2>
+<div class="w">
+  <div class="t">이번 주 (A반)</div>
+  <div class="band">
+    <div class="col a"><span>월</span><b>주</b><span>23</span></div>
+    <div class="col b"><span>화</span><b>야</b><span>24</span></div>
+    <div class="col c"><span>수</span><b>비</b><span>25</span></div>
+    <div class="col e now"><span>목</span><b>휴</b><span>26</span></div>
+    <div class="col a"><span>금</span><b>주</b><span>27</span></div>
+  </div>
+</div>
+<p>세로 막대 5칸. 색과 글자로 근무 한눈에. 오늘은 흰 테두리.</p>
+</body></html>

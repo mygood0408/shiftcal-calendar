@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>아이콘 A — 달력 격자</title>
+<style>
+body{margin:0;background:#dfe6ec;font-family:"Noto Sans KR",sans-serif;display:flex;flex-direction:column;align-items:center;gap:18px;padding:28px}
+h2{margin:0;font-size:18px;color:#17212b}
+.icon{width:192px;height:192px;border-radius:44px;background:#1f5f7a;position:relative;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.head{position:absolute;left:24px;right:24px;top:28px;height:34px;background:#fff;border-radius:10px 10px 0 0;color:#1f5f7a;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center}
+.grid{position:absolute;left:24px;right:24px;top:66px;bottom:24px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:5px;background:#fff;padding:6px;border-radius:0 0 12px 12px}
+.grid i{border-radius:4px}
+.d{background:#3f7d5c}.n{background:#33517e}.o{background:#8a6bb0}.r{background:#c9c4bb}
+.row{display:flex;gap:10px;align-items:flex-end}
+.small{width:96px;height:96px;border-radius:22px;background:#1f5f7a;position:relative;overflow:hidden}
+.small .head{top:14px;left:12px;right:12px;height:18px;font-size:9px;border-radius:5px 5px 0 0}
+.small .grid{top:34px;left:12px;right:12px;bottom:12px;gap:3px;padding:3px}
+p{margin:0;font-size:13px;color:#566676}
+</style></head><body>
+<h2>아이콘 A — 달력 격자 (근무 색 칸)</h2>
+<div class="icon">
+  <div class="head">교대달력</div>
+  <div class="grid">
+    <i class="d"></i><i class="n"></i><i class="o"></i><i class="r"></i>
+    <i class="n"></i><i class="r"></i><i class="d"></i><i class="o"></i>
+    <i class="o"></i><i class="d"></i><i class="r"></i><i class="n"></i>
+  </div>
+</div>
+<div class="row">
+  <div class="small"><div class="head">교대달력</div><div class="grid"><i class="d"></i><i class="n"></i><i class="o"></i><i class="r"></i><i class="n"></i><i class="r"></i><i class="d"></i><i class="o"></i><i class="o"></i><i class="d"></i><i class="r"></i><i class="n"></i></div></div>
+  <p>홈 화면 크기 미리보기</p>
+</div>
+</body></html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>위젯 B — 이번 주 막대</title>
+<style>
+body{margin:0;background:#dfe6ec;font-family:"Noto Sans KR",sans-serif;display:flex;flex-direction:column;align-items:center;gap:16px;padding:28px;color:#17212b}
+h2{margin:0;font-size:18px}
+p{margin:0;font-size:13px;color:#566676}
+/* 4x1 위젯 */
+.w{width:330px;height:150px;border-radius:24px;background:#eef3f7;box-shadow:0 8px 20px rgba(0,0,0,.18);padding:16px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
+.top{font-size:13px;font-weight:700;color:#566676;padding-left:6px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;flex:1}
+.d{border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:900}
+.d small{font-size:10px;font-weight:700;opacity:.85}
+.d span{font-size:15px}
+.d.today{outline:3px solid #17212b;outline-offset:2px}
+.a{background:#3f7d5c}.b{background:#33517e}.c{background:#8a6bb0}.e{background:#9a938a}
+</style></head><body>
+<h2>위젯 B — 이번 주 막대 (4×1)</h2>
+<div class="w">
+  <div class="top">11/23 ~ 11/29</div>
+  <div class="week">
+    <div class="d a"><small>월</small><span>23</span></div>
+    <div class="d b"><small>화</small><span>24</span></div>
+    <div class="d c"><small>수</small><span>25</span></div>
+    <div class="d e today"><small>목</small><span>26</span></div>
+    <div class="d a"><small>금</small><span>27</span></div>
+    <div class="d e"><small>토</small><span>28</span></div>
+    <div class="d e"><small>일</small><span>29</span></div>
+  </div>
+</div>
+<p>가로로 일주일 근무 색. 오늘은 칸 테두리로 표시.</p>
+</body></html>

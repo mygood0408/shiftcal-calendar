@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4×1 수정안 4</title>
+<style>
+body{margin:0;background:#cfd8e0;font-family:"Noto Sans KR",sans-serif;padding:28px;display:flex;flex-direction:column;gap:14px;align-items:center}
+h2{margin:0;font-size:18px;color:#17212b}
+.cap{font-size:13px;color:#566676;text-align:center;margin:4px 0 0}
+.w{width:330px;height:150px;border-radius:24px;box-sizing:border-box;padding:14px 12px;display:flex;flex-direction:column;gap:8px;background:#ffffff;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.head{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;padding:0 4px;color:#000}
+.head .range{font-weight:500;opacity:.7}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;flex:1}
+.day{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:0}
+.dn{font-size:11px;font-weight:700;color:#566676;height:20px;display:flex;align-items:center;justify-content:center}
+.dn.today{background:#17212b;color:#fff;border-radius:10px;padding:0 6px}
+.cell{width:100%;flex:1;border-radius:10px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;background:#ffffff;border:2px solid}
+</style></head><body>
+<h2>4×1 수정안 4 — 흰 배경</h2>
+<div>
+  <div class="w">
+    <div class="head"><span>이번 주 <span class="range">11.23 ~ 11.29</span></span><span>A반</span></div>
+    <div class="week">
+      <div class="day"><span class="dn">23</span><div class="cell" style="color:#000;border-color:#000">주</div></div>
+      <div class="day"><span class="dn">24</span><div class="cell" style="color:#33517e;border-color:#33517e">야</div></div>
+      <div class="day"><span class="dn">25</span><div class="cell" style="color:#0000ff;border-color:#0000ff">비</div></div>
+      <div class="day"><span class="dn today">26</span><div class="cell" style="color:#ff0000;border-color:#ff0000">휴</div></div>
+      <div class="day"><span class="dn">27</span><div class="cell" style="color:#000;border-color:#000">주</div></div>
+      <div class="day"><span class="dn">28</span><div class="cell" style="color:#ff0000;border-color:#ff0000">휴</div></div>
+      <div class="day"><span class="dn">29</span><div class="cell" style="color:#ff0000;border-color:#ff0000">휴</div></div>
+    </div>
+  </div>
+  <p class="cap">흰 배경, 칸 배경은 위젯과 같음. 오늘은 날짜 검정 알약</p>
+</div>
+</body></html>

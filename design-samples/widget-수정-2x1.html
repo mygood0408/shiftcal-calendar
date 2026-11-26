@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2×1 수정안 4</title>
+<style>
+body{margin:0;background:#cfd8e0;font-family:"Noto Sans KR",sans-serif;padding:28px;display:flex;flex-direction:column;gap:14px;align-items:center}
+h2{margin:0;font-size:18px;color:#17212b}
+.cap{font-size:13px;color:#566676;text-align:center;margin:4px 0 0}
+.w{width:330px;height:150px;border-radius:24px;box-sizing:border-box;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#ffffff;color:#000;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.top{display:flex;justify-content:space-between;font-size:12px;font-weight:700;opacity:.7}
+.main{display:flex;align-items:center;gap:12px;flex:1;min-height:0}
+.chip{width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;color:#fff;flex:none}
+.list{font-size:13px;line-height:1.5;color:#000;min-width:0}
+.list div::before{content:"· "}
+.strip{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#566676;margin-top:8px;flex-wrap:wrap;justify-content:center}
+.sw{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sw i{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-weight:900;font-size:14px}
+</style></head><body>
+<h2>2×1 수정안 4 — 흰 배경</h2>
+<div class="w">
+  <div class="top"><span>11월 26일 (목)</span><span>A반</span></div>
+  <div class="main">
+    <div class="chip" style="background:#000">주</div>
+    <div class="list"><div>치과 예약 14:00</div><div>하진이 생일</div><div>팀 회식 19:00</div></div>
+  </div>
+</div>
+<p class="cap">흰 배경, 근무칩에 근무 색</p>
+<div class="strip">
+  <div class="sw"><i style="background:#000">주</i>주간</div>
+  <div class="sw"><i style="background:#33517e">야</i>야간</div>
+  <div class="sw"><i style="background:#0000ff">비</i>비번</div>
+  <div class="sw"><i style="background:#ff0000">휴</i>휴무</div>
+  <div class="sw"><i style="background:#000">지원</i>지원근무<br>= 주간색</div>
+  <div class="sw"><i style="background:#ff0000">휴가</i>휴가<br>= 휴무색</div>
+</div>
+</body></html>

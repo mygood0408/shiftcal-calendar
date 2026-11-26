@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>위젯 A — 오늘 한 줄</title>
+<style>
+body{margin:0;background:#dfe6ec;font-family:"Noto Sans KR",sans-serif;display:flex;flex-direction:column;align-items:center;gap:16px;padding:28px;color:#17212b}
+h2{margin:0;font-size:18px}
+p{margin:0;font-size:13px;color:#566676}
+/* 2x1 위젯: 홈 화면 한 칸 두 개 가로 크기 */
+.w{width:330px;height:160px;border-radius:24px;background:#eef3f7;box-shadow:0 8px 20px rgba(0,0,0,.18);padding:18px 20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#566676;font-weight:700}
+.main{display:flex;align-items:center;gap:14px}
+.chip{width:64px;height:64px;border-radius:16px;background:#3f7d5c;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px}
+.txt b{display:block;font-size:24px;font-weight:900;letter-spacing:-.02em}
+.txt span{font-size:13px;color:#566676}
+.next{font-size:13px;color:#566676}
+.next b{color:#17212b}
+</style></head><body>
+<h2>위젯 A — 오늘 한 줄 (2×1)</h2>
+<div class="w">
+  <div class="top"><span>11월 26일 (목)</span><span>A반</span></div>
+  <div class="main">
+    <div class="chip">주간</div>
+    <div class="txt"><b>오늘은 주간</b><span>08:00 출근</span></div>
+  </div>
+  <div class="next">다음 근무 <b>11/27 야간</b></div>
+</div>
+<p>홈 한 칸 두 개 크기. 오늘의 근무만 크게 보여줌.</p>
+</body></html>
