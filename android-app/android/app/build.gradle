@@ -16,10 +16,25 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // 릴리스 서명: 키 경로와 비밀번호는 ~/.gradle/gradle.properties 에서 읽는다 (저장소에 넣지 않음)
+    // ponytail: 키 파일이 없으면 릴리스도 디버그 키로 서명됨 (개발 중 빌드 깨짐 방지)
+    signingConfigs {
+        release {
+            if (project.hasProperty('SHIFTCAL_STORE_FILE')) {
+                storeFile file(SHIFTCAL_STORE_FILE)
+                storePassword SHIFTCAL_STORE_PASSWORD
+                keyAlias SHIFTCAL_KEY_ALIAS
+                keyPassword SHIFTCAL_KEY_PASSWORD
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (project.hasProperty('SHIFTCAL_STORE_FILE')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
