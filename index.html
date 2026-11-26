@@ -208,6 +208,8 @@
     text-align:center;
   }
   [hidden]{ display:none !important; }
+  /* APK 상태바 아래로 내용 밀기 (브라우저·PWA에는 적용 안 됨) */
+  html.native body{ padding-top:32px; }
   /* 처음 시작 화면 */
   #view-onboard{ display:none; }
   body.onboarding #view-onboard{ display:block; padding-bottom:96px; }
@@ -1339,6 +1341,9 @@
   renderCalendarAll();
   updateScrollLock();
 })();
+
+// APK(Capacitor) 안에서는 상태바가 화면 위를 덮으므로 위쪽 여백을 따로 준다
+if(window.Capacitor){ document.documentElement.classList.add("native"); }
 
 // 오프라인 사용을 위한 service worker 등록 (파일 수정 후에는 sw.js의 CACHE 버전을 올릴 것)
 if("serviceWorker" in navigator){

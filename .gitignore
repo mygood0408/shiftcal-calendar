@@ -1,2 +1,9 @@
 shiftcal-backup-*.json
 _original/
+android-app/node_modules/
+android-app/www/
+android-app/android/app/build/
+android-app/android/build/
+android-app/android/.gradle/
+android-app/android/.idea/
+android-app/android/local.properties
