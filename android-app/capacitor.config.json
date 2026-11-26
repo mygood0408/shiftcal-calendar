@@ -1,0 +1,8 @@
+{
+  "appId": "com.shiftcal.calendar",
+  "appName": "교대달력",
+  "webDir": "www",
+  "android": {
+    "androidScheme": "https"
+  }
+}
