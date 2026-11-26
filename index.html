@@ -1250,6 +1250,16 @@
   document.getElementById("exportBtn").addEventListener("click", async function(){
     var filename = "shiftcal-backup-" + todayISO() + ".json";
     var json = JSON.stringify(state, null, 2);
+    // 0) 안드로이드 앱: WebView는 Blob 다운로드가 동작하지 않으므로 캐시에 파일을 쓰고 공유 창을 연다
+    var C = window.Capacitor;
+    if(C && C.Plugins && C.Plugins.Filesystem && C.Plugins.Share){
+      try{
+        await C.Plugins.Filesystem.writeFile({ path: filename, data: json, directory: "CACHE", encoding: "utf8" });
+        var uri = await C.Plugins.Filesystem.getUri({ path: filename, directory: "CACHE" });
+        await C.Plugins.Share.share({ title: filename, files: [uri.uri] });
+      }catch(e){ alert("내보내기 중 문제가 발생했어요."); }
+      return;
+    }
     // 1) 일반 다운로드 (Blob)
     try{ blobDownload(filename, json); return; }catch(e){}
     // 2) 마지막 수단: 클립보드에 복사

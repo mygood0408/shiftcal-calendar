@@ -78,8 +78,9 @@ final class ShiftWidgetRenderer {
         mgr.updateAppWidget(id, rv);
     }
 
-    private static int defaultW(int kind) { return kind == KIND_2X1 ? 250 : kind == KIND_4X1 ? 290 : 120; }
-    private static int defaultH(int kind) { return kind == KIND_1X2 ? 250 : 110; }
+    // 런처 칸 수 n ↔ dp 최소 크기: 1칸 40dp, 2칸 110dp, 4칸 250dp (70n-30)
+    private static int defaultW(int kind) { return kind == KIND_2X1 ? 110 : kind == KIND_4X1 ? 250 : 110; }
+    private static int defaultH(int kind) { return kind == KIND_1X2 ? 110 : 40; }
 
     // ---------- 2×1: 날짜·반 / 칩 + 오늘 일정 최대 3줄 ----------
     private static void draw2x1(Draw g, Snap s, int w, int h) {
@@ -91,18 +92,18 @@ final class ShiftWidgetRenderer {
         g.text(dateLine, 14, 22, 12, 0xB3000000, true, Paint.Align.LEFT);
         g.text(s.label, w - 14, 22, 12, BLACK, true, Paint.Align.RIGHT);
 
-        float chip = Math.min(58, h - 30 - 14);
-        g.rect(14, 30, 14 + chip, 30 + chip, 14, t.color);
+        float chip = 26;
+        g.rect(10, 30, 10 + chip, 30 + chip, 10, t.color);
         boolean two = t.shortText.length() > 1;
-        float fs = two ? 18 : 24;
-        g.text(t.shortText, 14 + chip / 2, 30 + chip / 2 + fs * 0.35f, fs, WHITE, true, Paint.Align.CENTER);
+        float fs = two ? 9 : 14;
+        g.text(t.shortText, 10 + chip / 2, 30 + chip / 2 + fs * 0.35f, fs, WHITE, true, Paint.Align.CENTER);
 
-        float lx = 14 + chip + 12, maxW = w - lx - 14;
+        float lx = 10 + chip + 8, maxW = w - lx - 8;
         if (t.items.isEmpty()) {
             g.text("일정 없음", lx, 44, 13, MUTED, false, Paint.Align.LEFT);
         } else {
-            for (int i = 0; i < Math.min(3, t.items.size()); i++) {
-                g.text(g.fit("· " + t.items.get(i), maxW, 13, false), lx, 44 + i * 19, 13, BLACK, false, Paint.Align.LEFT);
+            for (int i = 0; i < Math.min(2, t.items.size()); i++) {
+                g.text(g.fit("· " + t.items.get(i), maxW, 12, false), lx, 44 + i * 18, 12, BLACK, false, Paint.Align.LEFT);
             }
         }
     }
@@ -116,12 +117,12 @@ final class ShiftWidgetRenderer {
         Calendar sun = dayAt(-back + 6);
 
         String head = "이번 주 ";
-        g.text(head, 12, 20, 12, BLACK, true, Paint.Align.LEFT);
-        g.text(md(mon) + " ~ " + md(sun), 12 + g.width(head, 12, true), 20, 12, 0xB3000000, false, Paint.Align.LEFT);
-        g.text(s.label, w - 12, 20, 12, BLACK, true, Paint.Align.RIGHT);
+        g.text(head, 12, 16, 12, BLACK, true, Paint.Align.LEFT);
+        g.text(md(mon) + " ~ " + md(sun), 12 + g.width(head, 12, true), 16, 12, 0xB3000000, false, Paint.Align.LEFT);
+        g.text(s.label, w - 12, 16, 12, BLACK, true, Paint.Align.RIGHT);
 
         float left = 12, gap = 5, cw = (w - left * 2 - gap * 6) / 7f;
-        float dateTop = 28, cellTop = 54, cellBot = h - 12;
+        float dateTop = 18, cellTop = 36, cellBot = h - 6;
         String todayKey = key(today);
         for (int i = 0; i < 7; i++) {
             Calendar c = dayAt(-back + i);
@@ -141,7 +142,7 @@ final class ShiftWidgetRenderer {
         }
     }
 
-    // ---------- 1×2: 위 = 오늘, 아래 = 내일 (같은 크기·같은 디자인, 테두리·글자는 근무 색) ----------
+    // ---------- 1×2 (40×110): 위 = 오늘, 아래 = 내일 (같은 크기·같은 디자인, 테두리·글자는 근무 색) ----------
     private static void draw1x2(Draw g, Snap s, int w, int h) {
         g.rect(0, 0, w, h, 20, WHITE);
         float pad = 10, gap = 10;
@@ -154,14 +155,15 @@ final class ShiftWidgetRenderer {
             g.border(l, t, r, b, 18, 2, f.color);
 
             float x = l + 12, maxW = r - x - 10;
-            float y = t + 25;
+            float y = t + 16;
             String date = String.format(Locale.US, "%d/%d %s", c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), koWeek(c));
             g.text(date, x, y, 13, MUTED, true, Paint.Align.LEFT);
-            y += 21;
+            y += 18;
             g.text(g.fit(f.longText, maxW, 17, true), x, y, 17, f.color, true, Paint.Align.LEFT);
-            for (String item : f.items) {
-                y += 15;
-                if (y > b - 8) break;
+            for (int k = 0; k < Math.min(2, f.items.size()); k++) {
+                String item = f.items.get(k);
+                y += 14;
+                if (y > b - 3) break;
                 g.text(g.fit("· " + item, maxW, 11, false), x, y, 11, BLACK, false, Paint.Align.LEFT);
             }
         }
