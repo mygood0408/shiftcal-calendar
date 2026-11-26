@@ -581,7 +581,33 @@
       return null; // 깨진 데이터는 덮어쓰지 않고 처음 시작 화면으로 (아래 저장은 사용자가 시작하기를 누른 뒤에만 일어남)
     }
   }
-  function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+  function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} pushWidgetSnapshot(); }
+
+  // ---------- 안드로이드 위젯용 스냅샷 (APK에서만 window.ShiftWidget이 있음, 브라우저에서는 아무 일도 안 함) ----------
+  // 오늘 기준 앞뒤 14일치만 보낸다. 위젯은 이 범위 안에서 주간·내일·일정을 그린다.
+  function widgetSnapshot(){
+    var base = todayISO(), days = {};
+    for(var k=-14; k<=14; k++){
+      var dt = new Date(base+"T00:00:00"); dt.setDate(dt.getDate()+k);
+      var iso = isoOf(dt);
+      var ent = entryFor(iso);
+      days[iso] = {
+        code: ent.codeId || null,
+        support: ent.support,
+        leave: ent.leave,
+        holiday: holidayName(iso) || null,
+        memo: ent.memo || ""
+      };
+    }
+    return {
+      label: state.pattern === "weekday" ? "일근" : (state.myTeam + "반"),
+      codes: state.codes.map(function(c){ return {id:c.id, name:c.name, color:c.color}; }),
+      days: days
+    };
+  }
+  function pushWidgetSnapshot(){
+    try{ if(window.ShiftWidget && ShiftWidget.save) ShiftWidget.save(JSON.stringify(widgetSnapshot())); }catch(e){}
+  }
 
   // 새해가 되면 "내년분"으로 넣어둔 이월 휴가를 "올해분"으로 자동 승격시킨다.
   function rollBucketsToCurrentYear(s){
@@ -1338,6 +1364,7 @@
   // ---------- boot ----------
   applyFont();
   if(needsOnboarding){ document.body.classList.add("onboarding"); initObFields(); }
+  else pushWidgetSnapshot(); // 앱을 열 때마다 위젯 데이터를 최신으로 맞춤
   renderCalendarAll();
   updateScrollLock();
 })();
